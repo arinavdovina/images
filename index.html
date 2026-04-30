@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Конструктор промтов для учителя</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * { font-family: 'Inter', sans-serif; }
+
+    :root {
+      --accent: #6c47ff;
+      --accent2: #ff6b6b;
+      --accent3: #00c9a7;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .glass-light {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #a78bfa, #f472b6, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .step-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px;
+      transition: all 0.3s;
+    }
+    .step-dot.active {
+      background: linear-gradient(135deg, #6c47ff, #a855f7);
+      color: white;
+      box-shadow: 0 0 20px rgba(108,71,255,0.6);
+    }
+    .step-dot.done {
+      background: linear-gradient(135deg, #00c9a7, #00b894);
+      color: white;
+    }
+    .step-dot.inactive {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.4);
+    }
+
+    .step-line {
+      flex: 1; height: 2px;
+      background: rgba(255,255,255,0.1);
+      transition: all 0.3s;
+    }
+    .step-line.done { background: linear-gradient(90deg, #00c9a7, #6c47ff); }
+
+    input, select, textarea {
+      background: rgba(255,255,255,0.07) !important;
+      border: 1px solid rgba(255,255,255,0.15) !important;
+      color: white !important;
+      border-radius: 12px !important;
+      outline: none !important;
+      transition: all 0.3s !important;
+    }
+    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.35) !important; }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(108,71,255,0.7) !important;
+      background: rgba(255,255,255,0.1) !important;
+      box-shadow: 0 0 0 3px rgba(108,71,255,0.2) !important;
+    }
+    select option { background: #1e1b4b; color: white; }
+
+    .tag-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.75);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tag-btn:hover { border-color: #a78bfa; color: #a78bfa; }
+    .tag-btn.selected {
+      background: linear-gradient(135deg, #6c47ff, #a855f7);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 4px 15px rgba(108,71,255,0.4);
+    }
+
+    .section-card {
+      border-radius: 16px;
+      padding: 18px 20px;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      transition: all 0.3s;
+      margin-bottom: 10px;
+    }
+    .section-card:hover {
+      border-color: rgba(108,71,255,0.5);
+      background: rgba(108,71,255,0.08);
+    }
+    .section-card.active {
+      border-color: #6c47ff;
+      background: rgba(108,71,255,0.12);
+      box-shadow: 0 0 30px rgba(108,71,255,0.2);
+    }
+
+    .prompt-card {
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      border: 1.5px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03);
+      transition: all 0.25s;
+      margin-bottom: 8px;
+    }
+    .prompt-card:hover {
+      border-color: rgba(168,85,247,0.5);
+      background: rgba(168,85,247,0.07);
+    }
+    .prompt-card.active {
+      border-color: #a855f7;
+      background: rgba(168,85,247,0.13);
+      box-shadow: 0 0 20px rgba(168,85,247,0.15);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6c47ff, #a855f7);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(108,71,255,0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(108,71,255,0.55);
+    }
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.13);
+      color: white;
+    }
+
+    .result-box {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(108,71,255,0.4);
+      border-radius: 16px;
+      padding: 24px;
+      font-size: 14.5px;
+      line-height: 1.85;
+      color: rgba(255,255,255,0.92);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, #00c9a7, #00b894);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0,201,167,0.4); }
+
+    .section-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+    .pulse-ring {
+      animation: pulseRing 2s infinite;
+    }
+    @keyframes pulseRing {
+      0%,100% { box-shadow: 0 0 0 0 rgba(108,71,255,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(108,71,255,0); }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(108,71,255,0.4); border-radius: 99px; }
+
+    .level-pill {
+      padding: 8px 16px; border-radius: 999px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.6);
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.04);
+    }
+    .level-pill:hover { border-color: #60a5fa; color: #60a5fa; }
+    .level-pill.sel {
+      background: linear-gradient(135deg, #2563eb, #60a5fa);
+      border-color: transparent; color: white;
+      box-shadow: 0 4px 15px rgba(37,99,235,0.4);
+    }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(108,71,255,0.2);
+      border: 1px solid rgba(108,71,255,0.4);
+      border-radius: 999px;
+      padding: 4px 10px 4px 12px;
+      font-size: 12px; color: #c4b5fd;
+    }
+    .chip button {
+      background: none; border: none; cursor: pointer;
+      color: #c4b5fd; line-height: 1; padding: 0;
+      font-size: 14px; display: flex; align-items: center;
+    }
+    .chip button:hover { color: #f472b6; }
+
+    .floating-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: rgba(255,255,255,0.4);
+      margin-bottom: 6px; display: block;
+    }
+
+    .star { color: #f59e0b; }
+
+    .accordion-content { display: none; }
+    .accordion-content.open { display: block; }
+  </style>
+</head>
+<body class="text-white">
+
+<!-- HEADER -->
+<div class="sticky top-0 z-50 glass border-b border-white/10 px-6 py-4">
+  <div class="max-w-5xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xl" style="background:linear-gradient(135deg,#6c47ff,#a855f7)">✨</div>
+      <div>
+        <div class="font-800 text-sm gradient-text font-extrabold tracking-wide">PromptCraft</div>
+        <div class="text-xs text-white/40">Конструктор промтов для учителя</div>
+      </div>
+    </div>
+    <div class="text-xs text-white/30 hidden sm:block">AI-инструменты для урока английского</div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+  <!-- STEP INDICATOR -->
+  <div class="flex items-center mb-10 px-2" id="stepIndicator">
+    <!-- steps injected by JS -->
+  </div>
+
+  <!-- STEP 1: Анкета учителя -->
+  <div id="step1" class="fade-in">
+    <div class="glass rounded-2xl p-8 mb-6">
+      <h2 class="text-2xl font-bold mb-1">📋 Анкета учителя</h2>
+      <p class="text-white/50 text-sm mb-8">Заполните информацию об ученике и уроке — она войдёт в промт</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Язык -->
+        <div>
+          <span class="floating-label">Язык обучения <span class="star">★</span></span>
+          <div class="flex flex-wrap gap-2">
+            <button class="tag-btn selected" data-group="lang" data-val="English">🇬🇧 Английский</button>
+            <button class="tag-btn" data-group="lang" data-val="German">🇩🇪 Немецкий</button>
+            <button class="tag-btn" data-group="lang" data-val="French">🇫🇷 Французский</button>
+            <button class="tag-btn" data-group="lang" data-val="Spanish">🇪🇸 Испанский</button>
+            <button class="tag-btn" data-group="lang" data-val="Italian">🇮🇹 Итальянский</button>
+            <button class="tag-btn" data-group="lang" data-val="Chinese">🇨🇳 Китайский</button>
+          </div>
+        </div>
+
+        <!-- Уровень -->
+        <div>
+          <span class="floating-label">Уровень ученика <span class="star">★</span></span>
+          <div class="flex flex-wrap gap-2">
+            <button class="level-pill" data-group="level" data-val="A1 (Beginner)">A1</button>
+            <button class="level-pill" data-group="level" data-val="A2 (Elementary)">A2</button>
+            <button class="level-pill sel" data-group="level" data-val="B1 (Intermediate)">B1</button>
+            <button class="level-pill" data-group="level" data-val="B2 (Upper-Intermediate)">B2</button>
+            <button class="level-pill" data-group="level" data-val="C1 (Advanced)">C1</button>
+            <button class="level-pill" data-group="level" data-val="C2 (Proficiency)">C2</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Возраст/тип -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <span class="floating-label">Возраст / тип ученика <span class="star">★</span></span>
+          <div class="flex flex-wrap gap-2">
+            <button class="tag-btn" data-group="age" data-val="young learner (6–10 years old, child)">👦 6–10 лет</button>
+            <button class="tag-btn" data-group="age" data-val="teenager (11–17 years old)">🧑 11–17 лет</button>
+            <button class="tag-btn selected" data-group="age" data-val="adult learner">🧑‍💼 Взрослый</button>
+            <button class="tag-btn" data-group="age" data-val="business professional">💼 Бизнес</button>
+            <button class="tag-btn" data-group="age" data-val="exam candidate">📝 Подготовка к экзамену</button>
+          </div>
+        </div>
+        <div>
+          <span class="floating-label">Формат урока</span>
+          <div class="flex flex-wrap gap-2">
+            <button class="tag-btn selected" data-group="format" data-val="individual (one-to-one) lesson">👤 Индивидуальный</button>
+            <button class="tag-btn" data-group="format" data-val="small group (2–6 students)">👥 Малая группа</button>
+            <button class="tag-btn" data-group="format" data-val="class group (7+ students)">🏫 Класс</button>
+            <button class="tag-btn" data-group="format" data-val="online lesson">💻 Онлайн</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Описание ученика -->
+      <div class="mb-6">
+        <span class="floating-label">Описание ученика (интересы, слабые стороны, особенности)</span>
+        <textarea id="studentDesc" rows="3" placeholder="Например: любит футбол и технологии, плохо усваивает артикли, не любит грамматику, но активен в разговорных заданиях..." class="w-full p-4 rounded-xl text-sm resize-none"></textarea>
+      </div>
+
+      <!-- Тема урока -->
+      <div class="mb-6">
+        <span class="floating-label">Тема урока <span class="star">★</span></span>
+        <input type="text" id="lessonTopic" placeholder="Например: Travel and Tourism, Healthy Lifestyle, Social Media..." class="w-full p-4 text-sm"/>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <span class="text-xs text-white/30 self-center">Быстрый выбор:</span>
+          <button class="tag-btn text-xs" onclick="setTopic('Travel and Tourism')">✈️ Travel</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Technology and AI')">🤖 Technology</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Food and Nutrition')">🍔 Food</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Environment and Climate')">🌍 Environment</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Health and Wellbeing')">💪 Health</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Work and Career')">💼 Work</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Education and Learning')">📚 Education</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Sport and Fitness')">⚽ Sport</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Family and Relationships')">👨‍👩‍👧 Family</button>
+          <button class="tag-btn text-xs" onclick="setTopic('Movies and Entertainment')">🎬 Movies</button>
+        </div>
+      </div>
+
+      <!-- Лексика -->
+      <div class="mb-6">
+        <span class="floating-label">Ключевая лексика (необязательно)</span>
+        <div class="flex gap-2 mb-3">
+          <input type="text" id="vocabInput" placeholder="Введите слово или фразу и нажмите Enter..." class="flex-1 p-3 text-sm" onkeydown="if(event.key==='Enter'){addVocab();event.preventDefault()}"/>
+          <button onclick="addVocab()" class="btn-secondary text-sm px-4">+ Добавить</button>
+        </div>
+        <div id="vocabChips" class="flex flex-wrap gap-2 min-h-[24px]"></div>
+      </div>
+
+      <!-- Грамматика -->
+      <div class="mb-6">
+        <span class="floating-label">Грамматический фокус (необязательно)</span>
+        <div class="flex gap-2 mb-3">
+          <input type="text" id="grammarInput" placeholder="Например: Present Perfect, Conditionals Type 2..." class="flex-1 p-3 text-sm" onkeydown="if(event.key==='Enter'){addGrammar();event.preventDefault()}"/>
+          <button onclick="addGrammar()" class="btn-secondary text-sm px-4">+ Добавить</button>
+        </div>
+        <div id="grammarChips" class="flex flex-wrap gap-2 min-h-[24px]"></div>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <span class="text-xs text-white/30 self-center">Быстрый выбор:</span>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Present Simple')">Present Simple</button>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Present Perfect')">Present Perfect</button>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Past Simple')">Past Simple</button>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Future tenses')">Future</button>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Conditionals')">Conditionals</button>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Passive Voice')">Passive Voice</button>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Modal Verbs')">Modal Verbs</button>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Articles')">Articles</button>
+          <button class="tag-btn text-xs" onclick="addGrammarTag('Comparatives & Superlatives')">Comparatives</button>
+        </div>
+      </div>
+
+      <!-- Дополнительный контекст -->
+      <div>
+        <span class="floating-label">Дополнительный контекст / пожелания (необязательно)</span>
+        <textarea id="extraContext" rows="2" placeholder="Например: задание для домашней работы, нужно добавить юмор, сделать акцент на говорении..." class="w-full p-4 rounded-xl text-sm resize-none"></textarea>
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <button class="btn-primary flex items-center gap-2" onclick="goToStep2()">
+        Выбрать инструмент <span>→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Выбор раздела и промта -->
+  <div id="step2" class="fade-in hidden">
+    <div class="glass rounded-2xl p-8 mb-6">
+      <h2 class="text-2xl font-bold mb-1">🎯 Выберите инструмент</h2>
+      <p class="text-white/50 text-sm mb-8">Выберите раздел, затем конкретный AI-инструмент для вашего урока</p>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        <!-- Разделы -->
+        <div>
+          <span class="floating-label mb-4 block">Разделы</span>
+          <div id="sectionList"></div>
+        </div>
+
+        <!-- Промты внутри раздела -->
+        <div>
+          <span class="floating-label mb-4 block">Инструменты в разделе</span>
+          <div id="promptList" class="text-white/40 text-sm italic py-4">← Выберите раздел</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-between">
+      <button class="btn-secondary flex items-center gap-2" onclick="goToStep1()">← Назад</button>
+      <button class="btn-primary flex items-center gap-2" id="generateBtn" onclick="goToStep3()" disabled>
+        Сгенерировать промт ✨
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Результат -->
+  <div id="step3" class="fade-in hidden">
+    <div class="glass rounded-2xl p-8 mb-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-bold mb-1">✨ Ваш экспертный промт</h2>
+          <p class="text-white/50 text-sm" id="resultMeta"></p>
+        </div>
+        <div class="flex gap-3">
+          <button class="copy-btn" onclick="copyPrompt()" id="copyBtn">
+            <span>📋</span> Копировать
+          </button>
+        </div>
+      </div>
+
+      <div id="resultBox" class="result-box"></div>
+
+      <!-- Tags info -->
+      <div id="resultTags" class="flex flex-wrap gap-2 mt-4"></div>
+    </div>
+
+    <!-- Tips -->
+    <div class="glass rounded-2xl p-6 mb-6">
+      <h3 class="font-bold text-base mb-4 text-white/80">💡 Советы по использованию промта</h3>
+      <div id="tipsBox" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-white/60"></div>
+    </div>
+
+    <div class="flex flex-wrap justify-between gap-3">
+      <button class="btn-secondary flex items-center gap-2" onclick="goToStep2()">← Изменить инструмент</button>
+      <div class="flex gap-3">
+        <button class="btn-secondary flex items-center gap-2" onclick="goToStep1()">🔄 Новый промт</button>
+        <button class="btn-primary flex items-center gap-2" onclick="copyPrompt()">📋 Скопировать промт</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// =============================================
+// DATA
+// =============================================
+const SECTIONS = [
+  {
+    id: 1,
+    emoji: "📖",
+    color: "from-violet-500 to-purple-600",
+    title: "Лексика",
+    fullTitle: "AI-инструменты для работы с лексикой",
+    prompts: [
+      {
+        id: "word_lists",
+        title: "Word Lists",
+        desc: "Генерируем списки слов по теме урока",
+        emoji: "📝",
+        tags: ["лексика", "списки"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a comprehensive, pedagogically structured word list on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Include 20–25 carefully selected lexical items (nouns, verbs, adjectives, adverbs, collocations, phrasal verbs) that are highly relevant to the topic.`,
+            `For each item provide: the word/phrase, its part of speech, a clear and concise definition in ${d.level.includes('A') ? 'simple English' : 'English'}, a natural example sentence in context, and a Russian translation.`,
+            `Group words into 3–4 thematic subcategories for better organisation and retention.`,
+            `Mark items that are particularly useful for spoken communication with a 🗣️ symbol.`,
+            `Mark B2+ items or less common but high-value words with a ⭐ symbol.`,
+            `Add a "Power Phrases" section at the end with 5 ready-to-use expressions related to the topic.`,
+            ...(d.vocab.length ? [`Incorporate the following teacher-specified vocabulary: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Present as a clearly formatted table or structured list. Ensure all content is appropriate for the learner's age and profile.",
+          output_lang: "Russian headers/instructions, English content"
+        })
+      },
+      {
+        id: "idioms",
+        title: "Idioms with Examples & Translations",
+        desc: "Подбираем идиомы по теме с примерами и переводами",
+        emoji: "🗣️",
+        tags: ["идиомы", "лексика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Generate a curated set of idioms, fixed expressions, and figurative phrases related to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Select 10–12 idioms that are: (a) authentically used by native speakers, (b) appropriate for the learner's level (prefer well-known idioms for A/B levels, rarer ones for C level).`,
+            `For each idiom provide: the idiom in bold, its literal meaning (if helpful), its actual figurative meaning, 2 natural example sentences (one neutral, one conversational), register label (formal / informal / neutral), and a Russian translation.`,
+            `Include a brief "Origin / Fun Fact" note for 3–4 of the most interesting idioms to boost memorability.`,
+            `Add a mini-quiz at the end: 5 gap-fill sentences where students must insert the correct idiom.`,
+            ...(d.vocab.length ? [`Try to incorporate or connect to these words/phrases if possible: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Well-structured document with clear sections. Use emoji where appropriate to make it engaging.",
+          output_lang: "Russian explanations/instructions, English idioms and examples"
+        })
+      },
+      {
+        id: "matching_def",
+        title: "Matching Definitions",
+        desc: "Соотнести слово и его определение",
+        emoji: "🔗",
+        tags: ["задание", "определения"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a professional Matching Definitions exercise on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 3 sets of matching tasks of increasing difficulty: Set A (8 items, straightforward definitions), Set B (6 items, paraphrased / synonym-based definitions), Set C (4 items, definitions that require contextual understanding).`,
+            `Write definitions that are clear, unambiguous, and pitched at the right level — avoid circular definitions.`,
+            `Ensure words come from natural, topic-relevant contexts.`,
+            `Include an answer key at the end.`,
+            `Add a "Challenge Extension": 3 words for which students must write their own definitions without using the word itself.`,
+            ...(d.vocab.length ? [`Use these teacher-specified words as priority items: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Column A (words) and Column B (definitions) layout. Clearly numbered.",
+          output_lang: "Russian task instructions, English vocabulary content"
+        })
+      },
+      {
+        id: "what_am_i",
+        title: "What Am I?",
+        desc: "Загадки от первого лица",
+        emoji: "🤔",
+        tags: ["загадки", "творчество"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a set of engaging first-person riddles ("What Am I?") related to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Write 10 riddles in first-person voice, each containing 3–5 clue sentences.`,
+            `Clues should progress from vague/indirect to more specific — allowing for staged guessing.`,
+            `Use vocabulary and grammar appropriate for ${d.level} level.`,
+            `Include both concrete nouns (objects, places) and abstract concepts from the topic.`,
+            `Make the language rich but accessible: use metaphor, personification, and descriptive language.`,
+            `Provide an answer key with a brief explanation of why each clue works.`,
+            `Add a "Create Your Own" challenge: a template for students to write one riddle themselves.`,
+            ...(d.vocab.length ? [`Include at least 5 of these words within the riddles: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Numbered riddles, each with indented clue lines. Answer key at the end.",
+          output_lang: "Russian task intro, English riddle content"
+        })
+      },
+      {
+        id: "word_maps",
+        title: "Word Maps (Mind Maps)",
+        desc: "Ассоциативные карты вокруг ключевого слова",
+        emoji: "🗺️",
+        tags: ["карты", "ассоциации"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a detailed Word Map / Mind Map framework on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Identify 1 central concept (the core node) and build 5–6 main branches around it.`,
+            `For each branch provide: branch label, 4–6 related words/collocations, 2 example sentences, and 1 visual prompt or emoji.`,
+            `Include one branch dedicated to "Useful Phrases & Chunks" (multi-word expressions).`,
+            `Include one branch for "Opposites & Contrasts" to build semantic range.`,
+            `Suggest 3 ways the teacher can use this map in class (activities).`,
+            `Provide a blank template description that students can fill in themselves.`,
+            ...(d.vocab.length ? [`Incorporate these words into the map branches: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Text-based mind map with clear indentation and branch labels. Teacher activity suggestions at the end.",
+          output_lang: "Russian activity notes, English vocabulary content"
+        })
+      },
+      {
+        id: "emoji_quiz",
+        title: "Emoji Vocabulary Quiz",
+        desc: "Викторина с эмодзи вместо слов",
+        emoji: "😄",
+        tags: ["викторина", "игра"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a fun and pedagogically effective Emoji Vocabulary Quiz on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Design 4 rounds of the quiz:`,
+            `Round 1 — "Guess the Word": 8 single emoji clues → student guesses the vocabulary word.`,
+            `Round 2 — "Emoji Phrase": 6 emoji sequences → student decodes a phrase or expression.`,
+            `Round 3 — "Emoji Sentence": 5 emoji chains → student reconstructs a full sentence.`,
+            `Round 4 — "Create Your Own": student creates 3 emoji puzzles for a partner.`,
+            `Ensure all vocabulary is topic-relevant and level-appropriate.`,
+            `Include an answer key with brief explanations of tricky emoji choices.`,
+            ...(d.vocab.length ? [`Base the quiz primarily on these words: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Clearly separated rounds with emoji displayed prominently. Engaging, game-like tone.",
+          output_lang: "Russian instructions, English vocabulary"
+        })
+      },
+      {
+        id: "funny_dialogues",
+        title: "Funny Dialogues Builder",
+        desc: "Весёлые диалоги с изучаемой лексикой",
+        emoji: "💬",
+        tags: ["диалог", "юмор"],
+        generate: (d) => buildPrompt(d, {
+          task: `Write 3 short, genuinely funny dialogues that naturally incorporate target vocabulary on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Each dialogue: 8–12 lines, 2–3 characters with distinct voices/personalities, a clear comic situation related to the topic.`,
+            `Dialogue 1: absurdist/surreal humour. Dialogue 2: misunderstanding/wordplay. Dialogue 3: role reversal or unexpected twist.`,
+            `Bold all target vocabulary items in the text.`,
+            `After each dialogue: 3 comprehension questions + 1 "What happens next?" creative prompt.`,
+            `Include stage directions (in brackets) to make them performable in class.`,
+            `Add a vocabulary glossary at the end for any unusual words used.`,
+            ...(d.vocab.length ? [`Incorporate all of these words naturally: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Also practise this grammar point: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Script format with character names in bold/caps. Teacher notes at the end.",
+          output_lang: "Russian teacher notes, English dialogue content"
+        })
+      },
+      {
+        id: "funny_ad",
+        title: "Funny Ad Generator",
+        desc: "Шуточные рекламные объявления с новыми словами",
+        emoji: "📢",
+        tags: ["реклама", "творчество"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create 3 hilariously absurd advertising texts on the topic of "${d.topic}" that incorporate target vocabulary for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Ad 1: TV commercial script (20–25 seconds). Ad 2: Social media post/banner. Ad 3: Radio jingle (4–6 rhyming lines).`,
+            `Each ad must: use at least 6 target vocabulary words, have a ridiculous product/service that's loosely related to the topic, include persuasive language devices (hyperbole, tripling, rhetorical questions).`,
+            `Bold all target vocabulary.`,
+            `Add a "Vocabulary in Action" section: explain how each bolded word functions persuasively.`,
+            `Include a student task: create your own funny ad for an equally absurd product.`,
+            ...(d.vocab.length ? [`Use these vocabulary items: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Each ad clearly separated. Exaggerated, punchy advertising language.",
+          output_lang: "Russian task instructions, English ad content"
+        })
+      },
+      {
+        id: "fake_news",
+        title: "Fake News Articles",
+        desc: "Юмористические новостные заметки с лексикой",
+        emoji: "📰",
+        tags: ["текст", "юмор"],
+        generate: (d) => buildPrompt(d, {
+          task: `Write 2 satirical / comedic fake news articles on the topic of "${d.topic}" using target vocabulary, designed for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Each article: 150–200 words, realistic newspaper structure (headline, dateline, lead paragraph, body, closing quote), but with an absurd premise.`,
+            `Use authentic journalistic language (passive voice, reported speech, formal vocabulary) ironically contrasted with the ridiculous content.`,
+            `Bold all target vocabulary.`,
+            `After each article: True/False/Not Given exercise (6 items), find-the-vocabulary task, and a "Write the headline for the sequel" challenge.`,
+            `Include a note to the teacher on how to use the articles for media literacy discussion.`,
+            ...(d.vocab.length ? [`Ensure these words appear in the articles: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Newspaper layout style. Teacher notes in a separate box.",
+          output_lang: "Russian task instructions, English article content"
+        })
+      },
+      {
+        id: "cryptogram",
+        title: "Cryptogram Puzzle Generator",
+        desc: "Зашифрованные слова для расшифровки",
+        emoji: "🔐",
+        tags: ["игра", "шифр"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a complete Cryptogram Puzzle activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Design a Caesar cipher (shift 3) or substitution cipher and apply it to 12–15 topic-related words.`,
+            `Show the cipher key/alphabet clearly.`,
+            `Include 3 levels: Level 1 (encode individual words), Level 2 (decode phrases), Level 3 (decode a 2–3 sentence message).`,
+            `Add a "Create Your Own Secret Message" task where students encode a sentence using the key.`,
+            `Include a complete answer key.`,
+            `Explain to the teacher how to adapt this as a group/team competition.`,
+            ...(d.vocab.length ? [`Encode these specific words: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Visual puzzle layout with clear boxes/dashes for encoding. Answer key at the end.",
+          output_lang: "Russian instructions, English puzzle content"
+        })
+      },
+    ]
+  },
+  {
+    id: 2,
+    emoji: "📄",
+    color: "from-blue-500 to-cyan-600",
+    title: "Работа с текстом",
+    fullTitle: "AI-инструменты для работы с текстами",
+    prompts: [
+      {
+        id: "true_false",
+        title: "True / False Exercise",
+        desc: "Утверждения: верно или неверно?",
+        emoji: "✅",
+        tags: ["текст", "понимание"],
+        generate: (d) => buildPrompt(d, {
+          task: `First, write a rich reading text (200–300 words) on the topic of "${d.topic}" suitable for a ${d.level} ${d.lang} learner. Then create a comprehensive True / False exercise based on it.`,
+          requirements: [
+            `Text requirements: engaging, informative, with varied sentence structure, appropriate for ${d.level}, containing rich topic vocabulary.`,
+            `Create 3 sets of statements: Set A — True/False (8 items), Set B — True/False/Not Given (6 items), Set C — True/False + Correction (5 items: student corrects the false statements).`,
+            `Statements should test different comprehension skills: literal understanding, inference, vocabulary in context, and author's attitude.`,
+            `Avoid statements that are too obvious — include at least 3 "tricky" items that require careful reading.`,
+            `Include answer key with brief explanations for each answer.`,
+            ...(d.vocab.length ? [`Include these vocabulary items naturally in the text: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Use these grammar structures in the text: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Text in a box, then numbered statement sets below. Answer key at the end.",
+          output_lang: "Russian task instructions, English text and exercises"
+        })
+      },
+      {
+        id: "mcq",
+        title: "Multiple Choice Questions",
+        desc: "Вопросы с несколькими вариантами ответа",
+        emoji: "🔘",
+        tags: ["MCQ", "понимание"],
+        generate: (d) => buildPrompt(d, {
+          task: `Write an engaging reading passage (250–350 words) on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner, then create a rigorous Multiple Choice Question exercise.`,
+          requirements: [
+            `Create 12 MCQ items (4 options each: A, B, C, D) covering: main idea (2), specific detail (4), vocabulary in context (2), inference (2), author's purpose/tone (2).`,
+            `Design distractors that are plausible but clearly incorrect upon careful reading.`,
+            `Include question types: "According to the text...", "The word X in paragraph Y most likely means...", "The author implies that...", "Which of the following best summarises...".`,
+            `Mark the difficulty level of each question: [Easy], [Medium], [Hard].`,
+            `Provide a detailed answer key explaining why each correct answer is right and why distractors are wrong.`,
+            ...(d.vocab.length ? [`Include this vocabulary in the text: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Text in a framed box. Questions numbered below. Answer key in a separate section.",
+          output_lang: "Russian instructions, English text and MCQ content"
+        })
+      },
+      {
+        id: "comprehension_q",
+        title: "Text-Based Comprehension Questions",
+        desc: "Открытые вопросы на понимание текста",
+        emoji: "❓",
+        tags: ["вопросы", "понимание"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a rich reading passage (300–400 words) on "${d.topic}" for a ${d.level} ${d.lang} learner, then design a layered set of open comprehension questions.`,
+          requirements: [
+            `Questions in 4 tiers: Tier 1 — Retrieval (3 questions: direct answers in text), Tier 2 — Inference (3 questions: reading between the lines), Tier 3 — Evaluation (2 questions: student's opinion/judgement), Tier 4 — Extension (2 questions: connect to own experience or wider world).`,
+            `Use a variety of question stems: "What does the author mean by...?", "How does X affect Y?", "To what extent do you agree...?", "Can you think of a real-life example where...?"`,
+            `Include model answers for Tier 1–2 and sample points for Tier 3–4.`,
+            `Add a "Talk About It" box: 3 discussion prompts for speaking extension.`,
+            ...(d.vocab.length ? [`Embed these words in the text: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Model these structures in the text: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Text, then tiered questions. Model answers in a collapsible/separate section.",
+          output_lang: "Russian tier labels and instructions, English content"
+        })
+      },
+      {
+        id: "fill_blanks",
+        title: "Fill in the Blanks",
+        desc: "Восстановление пропусков в тексте",
+        emoji: "✏️",
+        tags: ["пропуски", "грамматика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a Fill in the Blanks activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Write a coherent passage (200–250 words) with 15 blanks of 3 types: Type A — vocabulary (6 blanks, key content words), Type B — grammar (5 blanks, testing ${d.grammar.length ? d.grammar.join(', ') : 'appropriate grammar for the level'}), Type C — discourse markers/linkers (4 blanks).`,
+            `Create 3 versions of the exercise: Version 1 (with word bank, easy), Version 2 (without word bank, medium), Version 3 (with partially given words e.g. first letter only, hard).`,
+            `Ensure blanks test meaningful knowledge, not just guesswork.`,
+            `Include the complete original text as the answer key.`,
+            `Add teacher notes on which version to use and how to extend the activity.`,
+            ...(d.vocab.length ? [`Remove these words to create the vocabulary blanks: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Three clearly labelled versions. Original text as answer key at the end.",
+          output_lang: "Russian instructions, English exercise content"
+        })
+      },
+      {
+        id: "sequencing",
+        title: "Story Sequencing",
+        desc: "Расставить события в правильном порядке",
+        emoji: "🔢",
+        tags: ["текст", "порядок"],
+        generate: (d) => buildPrompt(d, {
+          task: `Write a narrative or process-based text on "${d.topic}" for a ${d.level} ${d.lang} learner, then create a multi-level Story Sequencing activity.`,
+          requirements: [
+            `Write a text of 250–300 words with a clear sequence of 10–12 distinct events or steps.`,
+            `Cut the text into segments at logical points (not mid-sentence).`,
+            `Task 1: Put 10 events in order (sentence-level sequencing).`,
+            `Task 2: Put 5 paragraph-sized chunks in order.`,
+            `Task 3: Fill in a timeline with key events and dates/times.`,
+            `Task 4: "What's missing?" — identify which event from a list does NOT appear in the text.`,
+            `Include the correct sequence as an answer key.`,
+            ...(d.vocab.length ? [`Use these words in the text: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Text followed by scrambled versions. Timeline template. Answer key at end.",
+          output_lang: "Russian task labels, English content"
+        })
+      },
+      {
+        id: "creative_writing_topics",
+        title: "Topics for Creative Writing",
+        desc: "Темы для эссе, писем, рассказов",
+        emoji: "✍️",
+        tags: ["письмо", "творчество"],
+        generate: (d) => buildPrompt(d, {
+          task: `Generate a rich bank of creative writing prompts connected to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Provide writing prompts in 6 formats: Essay (2 prompts), Personal Letter (2 prompts), Formal Email (1 prompt), Short Story (2 prompts), Blog Post (1 prompt), Social Media Caption / Thread (2 prompts).`,
+            `Each prompt should include: the task itself, suggested word count, key vocabulary to include, structural tips (e.g. "Use a hook opening", "Include a counterargument").`,
+            `Include 3 "challenge" prompts that require higher-order thinking.`,
+            `Add a "Success Criteria" checklist for each writing type.`,
+            ...(d.vocab.length ? [`Require students to incorporate: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Target these grammar structures in the writing: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Prompts grouped by writing type. Success criteria in checklist format.",
+          output_lang: "Russian instructions and criteria, English prompts and vocabulary"
+        })
+      },
+      {
+        id: "glossary",
+        title: "Glossary and Key Vocabulary",
+        desc: "Словарь ключевых слов из текста",
+        emoji: "📚",
+        tags: ["словарь", "лексика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a professional learner's glossary of key vocabulary related to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Select 25–30 high-value lexical items from the topic.`,
+            `For each entry: headword + phonetic transcription (IPA) + part of speech + definition in English + Russian translation + example sentence + common collocations (2–3) + register label.`,
+            `Organise in alphabetical order AND provide a second version organised thematically.`,
+            `Add a "Word Family" section for 8 key words (e.g. travel → traveller, travelling, travellable).`,
+            `Include a self-testing grid at the end (word | cover definition | cover translation | cover example).`,
+            ...(d.vocab.length ? [`Prioritise these teacher-specified items: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Professional glossary table format. Word family section. Self-test grid.",
+          output_lang: "Russian translations and labels, English definitions and examples"
+        })
+      },
+      {
+        id: "emoji_reading",
+        title: "Text to Emojis / Emoji Reading Game",
+        desc: "Часть слов заменена эмодзи — восстановить смысл",
+        emoji: "🎮",
+        tags: ["игра", "эмодзи"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create an Emoji Reading Game based on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Write a text of 150–200 words, then create 3 emoji versions:`,
+            `Version 1: Replace 20% of content words with emoji (easier).`,
+            `Version 2: Replace 40% of words (medium).`,
+            `Version 3: Tell the whole story using only emoji (harder — students write the text).`,
+            `For Version 3: provide 40–50 emoji in a specific sequence and ask students to write the story.`,
+            `Include a "Reverse Task": students read the original text and create their own emoji version.`,
+            `Provide answer keys for Versions 1–2 and model answer for Version 3.`,
+            ...(d.vocab.length ? [`Include these target words (some replaced by emoji): ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Three clearly labelled versions. Answer keys. Fun, playful tone.",
+          output_lang: "Russian instructions, English text content"
+        })
+      },
+      {
+        id: "subtitles_to_text",
+        title: "Subtitles to Text",
+        desc: "Субтитры → связный текст для работы на уроке",
+        emoji: "🎬",
+        tags: ["видео", "текст"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a complete video-to-text activity framework on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Write a sample subtitle-style transcript (200–250 words) that simulates what students might hear in a documentary/video on the topic.`,
+            `Transform it into a polished written text with proper paragraphing, connectors, and formal register.`,
+            `Pre-watching tasks (2): vocabulary prediction, image/title brainstorm.`,
+            `While-watching tasks (3): gist question, specific information grid, language note task.`,
+            `Post-watching tasks (3): text reconstruction from notes, summary writing, discussion questions.`,
+            `Include a "Notice the Language" section: highlight 5 differences between spoken subtitle style and written text.`,
+            ...(d.vocab.length ? [`Focus pre-teaching on these items: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Clear pre/while/post task sections. Transcript and text version clearly labelled.",
+          output_lang: "Russian task instructions, English content"
+        })
+      },
+      {
+        id: "rewriting",
+        title: "Rewriting Texts",
+        desc: "Переписать текст от лица разных персонажей",
+        emoji: "🔄",
+        tags: ["письмо", "творчество"],
+        generate: (d) => buildPrompt(d, {
+          task: `Write an original text on "${d.topic}" (150–200 words) and then create a rich Rewriting activity for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Original text: neutral, balanced, third-person narrative.`,
+            `Provide 5 rewriting tasks from different perspectives: (1) a passionate supporter of the topic, (2) a harsh critic, (3) a 10-year-old child explaining to a friend, (4) a famous historical figure, (5) a social media influencer.`,
+            `For each perspective: include 3–4 language tips (vocabulary, tone, sentence structure shifts).`,
+            `Include a "Before & After" comparison showing how one paragraph changes across two perspectives.`,
+            `Add a peer assessment rubric: accuracy, register appropriateness, creativity, vocabulary use.`,
+            ...(d.vocab.length ? [`Include in the original text: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Model these structures: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Original text, then rewriting tasks. Language tips in bullet points. Rubric at the end.",
+          output_lang: "Russian task labels and rubric, English text content"
+        })
+      },
+    ]
+  },
+  {
+    id: 3,
+    emoji: "🎤",
+    color: "from-rose-500 to-pink-600",
+    title: "Устные разминки",
+    fullTitle: "AI-инструменты для создания устных разминок",
+    prompts: [
+      {
+        id: "quick_warmup",
+        title: "Questions for a Quick Warm-Up",
+        desc: "Короткие вопросы для устной разминки",
+        emoji: "⚡",
+        tags: ["разминка", "говорение"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a comprehensive Quick Warm-Up question bank on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Generate 30 warm-up questions in 4 categories:`,
+            `Category 1 — Personal Experience (8 questions): directly connecting to the student's life.`,
+            `Category 2 — Opinion & Debate (8 questions): requiring a viewpoint with justification.`,
+            `Category 3 — Imagination & Hypothetical (7 questions): creative "what if" thinking.`,
+            `Category 4 — Knowledge & Culture (7 questions): facts, customs, global perspectives.`,
+            `Questions should progress from simple/personal to complex/abstract within each category.`,
+            `Mark questions suitable for a 1-minute answer with ⏱️ and for extended 3-minute discussion with 💬.`,
+            `Include 5 "Icebreaker" questions to use at the very start.`,
+            ...(d.vocab.length ? [`Weave in or reference these words: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Categorised question lists. Timing markers. Icebreakers at the top.",
+          output_lang: "Russian category labels, English questions"
+        })
+      },
+      {
+        id: "would_you_rather",
+        title: "Would You Rather…?",
+        desc: "Вопросы «Would you rather…?» по теме",
+        emoji: "🤷",
+        tags: ["игра", "говорение"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a rich "Would You Rather...?" activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Write 20 "Would You Rather...?" dilemmas in 3 tiers:`,
+            `Tier 1 — Fun & Easy (8): light-hearted choices related to the topic, simple vocabulary.`,
+            `Tier 2 — Thought-Provoking (8): require comparison, preference justification, value judgements.`,
+            `Tier 3 — Philosophical (4): deeper ethical/social dilemmas connected to the topic.`,
+            `For each dilemma include: the question + 3 "Follow-up" prompts (e.g. "Why?", "What would change your mind?", "Can you think of a situation where...?").`,
+            `Add a "Useful Language" box: phrases for agreeing, disagreeing, and justifying (appropriate for ${d.level}).`,
+            `Include a teacher variation: "Hot Seat" game instructions using these dilemmas.`,
+            ...(d.vocab.length ? [`Incorporate this vocabulary into the dilemmas: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Three-tier layout. Follow-up prompts indented. Useful Language box.",
+          output_lang: "Russian tier labels and teacher tips, English dilemmas"
+        })
+      },
+      {
+        id: "name_5",
+        title: "Name 5 Challenge",
+        desc: "Назвать пять слов/понятий по теме",
+        emoji: "5️⃣",
+        tags: ["игра", "быстро"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a comprehensive "Name 5" Challenge activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 25 "Name 5" challenges in 4 difficulty levels:`,
+            `Level 1 — Basic (7): broad, easy categories (e.g. "Name 5 words related to ${d.topic}").`,
+            `Level 2 — Specific (7): narrower categories requiring more knowledge.`,
+            `Level 3 — Vocabulary Focus (6): categories targeting specific word types (collocations, phrasal verbs, idioms).`,
+            `Level 4 — Creative (5): unusual/creative categories that require lateral thinking.`,
+            `Include timer suggestions (10–30 seconds per challenge).`,
+            `Provide a sample answer list for each challenge (teacher's reference).`,
+            `Game variants: individual timed, team competition, "hot potato" group version.`,
+            ...(d.vocab.length ? [`Create specific challenges around: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Levelled challenge cards format. Sample answers in grey/smaller text. Game instructions.",
+          output_lang: "Russian game instructions, English challenge content"
+        })
+      },
+      {
+        id: "if_i_could",
+        title: '"If I could…, I would…"',
+        desc: "Условные предложения для устного завершения",
+        emoji: "💭",
+        tags: ["грамматика", "говорение"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create an "If I could... I would..." speaking activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Generate 30 conditional sentence starters in 4 types:`,
+            `Type 1 — Real/possible (7): present/future conditions related to the topic.`,
+            `Type 2 — Unreal present/imaginary (10): hypothetical situations.`,
+            `Type 3 — Past hypothetical (7): reflecting on what could have been.`,
+            `Mixed/complex (6): blending multiple conditional patterns for advanced practice.`,
+            `For each starter: suggest a "thinking prompt" to help students expand their answer.`,
+            `Include a "Language Booster" box: expressions for extending conditional answers (e.g. "What's more...", "On the other hand...", "Unless...").`,
+            `Add a "Debate" extension: pairs argue opposite sides of the same conditional.`,
+            ...(d.vocab.length ? [`Connect the conditionals to: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Focus on: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Four conditional types clearly labelled. Thinking prompts in italics. Language booster box.",
+          output_lang: "Russian labels and tips, English sentence starters"
+        })
+      },
+      {
+        id: "role_play",
+        title: "Role Play Scenarios",
+        desc: "Ситуации для ролевых игр и диалогов",
+        emoji: "🎭",
+        tags: ["ролевая игра", "говорение"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a comprehensive set of Role Play scenarios on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 5 detailed role play scenarios:`,
+            `Each scenario includes: context/setting, character role cards (A and B), communication goal, useful vocabulary/phrases for each role, and a "twist" mid-role-play complication card.`,
+            `Scenarios range from: formal professional (2) to semi-formal (2) to informal/social (1).`,
+            `Include a "Success Criteria" rubric: fluency, vocabulary use, achieving communication goal, naturalness.`,
+            `Add "Extension" versions of 2 scenarios for stronger students.`,
+            `Provide teacher observation checklist for monitoring during role play.`,
+            ...(d.vocab.length ? [`Require students to use: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Students should demonstrate: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Individual scenario cards with roles clearly separated. Rubric at end. Teacher notes.",
+          output_lang: "Russian teacher notes and rubric, English scenario content"
+        })
+      },
+      {
+        id: "taboo",
+        title: "Taboo Words",
+        desc: "Объяснить слово без запрещённых слов",
+        emoji: "🚫",
+        tags: ["игра", "лексика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a full Taboo Word Game set on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 30 Taboo cards (20 topic-related + 10 general vocabulary from ${d.level} level).`,
+            `Each card: TARGET WORD (large) + 5 taboo words below it (the most obvious synonyms/related words to avoid).`,
+            `Include 3 difficulty levels: Easy (10 cards), Medium (12 cards), Hard (8 cards) — with harder taboo restrictions as difficulty increases.`,
+            `Add a variation: "Silent Taboo" (mime-only version) and "Written Taboo" (write a definition without the taboo words).`,
+            `Include complete game rules in simple English.`,
+            `Teacher notes: how to use for both production and receptive vocabulary practice.`,
+            ...(d.vocab.length ? [`Include these as target words: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Card-style layout. Difficulty level marked on each card. Game rules in a box.",
+          output_lang: "Russian game instructions, English card content"
+        })
+      },
+      {
+        id: "charades",
+        title: "Charades",
+        desc: "Показать слово мимикой и жестами",
+        emoji: "🙌",
+        tags: ["игра", "пантомима"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a creative Charades activity pack on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Generate 40 charade cards in 4 categories: Verbs/Actions (12), Nouns/Objects (12), Phrases/Idioms (10), Abstract Concepts (6).`,
+            `For each card: the word/phrase + acting tips (how to mime it) + taboo gesture (one obvious mime to avoid) + difficulty rating (1–3 stars).`,
+            `Create 3 game variants: Classic (individual miming), Team Relay, Speed Round.`,
+            `Include 5 "Impossible Charades" cards — deliberately tricky abstract words that spark discussion.`,
+            `Add a "Debrief" task: after each word is guessed, students use it in a sentence.`,
+            ...(d.vocab.length ? [`Include these words: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Card-style layout by category. Acting tips in italics. Game variants as separate section.",
+          output_lang: "Russian game instructions, English card content"
+        })
+      },
+      {
+        id: "meme_creator",
+        title: "Meme Creator",
+        desc: "Мемы по теме урока для обсуждения",
+        emoji: "😂",
+        tags: ["мем", "творчество"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a Meme-Based Discussion activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Design 8 original meme concepts (describe the image and text): 4 humorous, 2 thought-provoking, 2 educational.`,
+            `For each meme: image description + top text + bottom text + 3 discussion questions + target vocabulary connection.`,
+            `Include a "Create Your Own Meme" task: template with blanks for image choice, text, and vocabulary requirement.`,
+            `Add a "Meme Debate": pairs argue whether each meme is funny, offensive, or accurate.`,
+            `Language focus: informal language, internet slang (age-appropriate), sarcasm, understatement.`,
+            `Teacher notes: digital citizenship discussion points.`,
+            ...(d.vocab.length ? [`Connect memes to this vocabulary: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Meme descriptions in a visual-friendly format. Discussion questions below each. Create-your-own template.",
+          output_lang: "Russian discussion prompts and notes, English meme content"
+        })
+      },
+    ]
+  },
+  {
+    id: 4,
+    emoji: "📐",
+    color: "from-amber-500 to-orange-600",
+    title: "Грамматика",
+    fullTitle: "AI-инструменты для грамматических заданий",
+    prompts: [
+      {
+        id: "sent_completion",
+        title: "Sentence Completion",
+        desc: "Вставить правильную грамматическую форму",
+        emoji: "📝",
+        tags: ["грамматика", "форма"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a comprehensive Sentence Completion exercise targeting ${d.grammar.length ? d.grammar.join(', ') : 'key grammar for ' + d.level + ' level'} in the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Write 25 sentence completion items in 4 sub-tasks:`,
+            `Task A (7): Supply the correct form of the word in brackets (morphological transformation).`,
+            `Task B (7): Complete the sentence with 2–5 words (free completion, one correct answer).`,
+            `Task C (6): Choose the grammatically correct completion from 2 options (forced choice).`,
+            `Task D (5): Complete the sentence so that it means the same as the sentence above (key word transformation).`,
+            `All sentences should be thematically connected to ${d.topic}.`,
+            `Include a grammar reference box summarising the key rules being tested.`,
+            `Provide a full answer key with grammar explanations for each answer.`,
+            ...(d.vocab.length ? [`Use this vocabulary in the sentences: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Four sub-tasks clearly labelled. Grammar reference box. Detailed answer key.",
+          output_lang: "Russian task instructions and explanations, English sentence content"
+        })
+      },
+      {
+        id: "mc_grammar",
+        title: "Multiple Choice Grammar Quiz",
+        desc: "Выбрать правильный грамматический вариант",
+        emoji: "🔘",
+        tags: ["грамматика", "MCQ"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a rigorous Multiple Choice Grammar Quiz focusing on ${d.grammar.length ? d.grammar.join(', ') : 'core grammar at ' + d.level + ' level'}, contextualised around "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 20 MCQ items (A/B/C/D options) testing: tense/aspect (5), form/structure (5), word form (3), sentence structure (4), collocations (3).`,
+            `Each distractor must be a plausible error that students at this level commonly make.`,
+            `Items should increase in difficulty (mark each: ⚪ easy / 🟡 medium / 🔴 hard).`,
+            `After the quiz: a "Common Errors Analysis" section explaining the 5 most frequently confused options.`,
+            `Include a "Score Interpretation" guide: 0–10 / 11–15 / 16–20 with study recommendations.`,
+            `All sentences must use topic vocabulary and feel natural.`,
+            ...(d.vocab.length ? [`Include this vocabulary: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Numbered MCQ with options. Difficulty markers. Error analysis and score guide at end.",
+          output_lang: "Russian instructions and analysis, English quiz content"
+        })
+      },
+      {
+        id: "error_correction",
+        title: "Error Correction",
+        desc: "Найти и исправить грамматические ошибки",
+        emoji: "🔍",
+        tags: ["ошибки", "коррекция"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a sophisticated Error Correction exercise targeting ${d.grammar.length ? d.grammar.join(', ') : 'common grammar errors at ' + d.level + ' level'} within the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Design 4 error correction tasks:`,
+            `Task 1 (8 sentences): each sentence has exactly ONE error. Student corrects and names the error type.`,
+            `Task 2 (6 sentences): sentences may have 0, 1, or 2 errors. Student must tick if correct.`,
+            `Task 3: a short paragraph (100 words) with 8 embedded errors. Student finds and corrects all.`,
+            `Task 4: a "Teacher's Marking" task — a student's writing sample with errors marked but not corrected; student provides corrections.`,
+            `Errors should reflect real learner mistakes typical for ${d.level} level.`,
+            `Include an error category key: [TENSE] [ARTICLE] [PREP] [AGREEMENT] [WORD ORDER] etc.`,
+            `Full answer key with explanation of each error.`,
+            ...(d.vocab.length ? [`Incorporate this vocabulary in sentences: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Four tasks clearly labelled. Error category key. Detailed answer key.",
+          output_lang: "Russian task instructions and error labels, English content"
+        })
+      },
+      {
+        id: "q_formation",
+        title: "Question Formation",
+        desc: "Преобразовать утверждения в вопросы",
+        emoji: "❓",
+        tags: ["вопросы", "грамматика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a thorough Question Formation exercise in the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Build 5 tasks covering all question types:`,
+            `Task 1 (6 items): Statement → Yes/No question.`,
+            `Task 2 (6 items): Statement + question word → Wh- question.`,
+            `Task 3 (5 items): Answer → formulate the question that produced this answer.`,
+            `Task 4 (4 items): Indirect/embedded questions (e.g. "Can you tell me where...?").`,
+            `Task 5 (5 items): Question word jumble (unscramble the words to form a question).`,
+            `Mark which auxiliary verbs/structures are required for each item.`,
+            `Include a grammar summary: question formation rules with examples.`,
+            `Full answer key.`,
+            ...(d.vocab.length ? [`Use this vocabulary in the exercise: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Five tasks clearly labelled. Grammar summary box. Answer key.",
+          output_lang: "Russian instructions, English exercise content"
+        })
+      },
+      {
+        id: "tag_q",
+        title: "Tag Questions",
+        desc: "Добавить вопросительный «хвостик»",
+        emoji: "🏷️",
+        tags: ["tag questions", "грамматика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a comprehensive Tag Questions exercise in the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 4 task levels:`,
+            `Level 1 (8 items): Add the correct tag to simple positive/negative sentences.`,
+            `Level 2 (6 items): Complex sentences with modal verbs, imperatives, "there is/are".`,
+            `Level 3 (5 items): Multiple choice — choose the correct tag from 3 options.`,
+            `Level 4 (4 items): Mixed — some sentences are complete; identify which tags are wrong and correct them.`,
+            `Include an intonation guide: rising vs. falling tag intonation with meaning explanation.`,
+            `Real-world usage section: 5 authentic examples of tag questions in natural conversation.`,
+            `Full answer key.`,
+            ...(d.vocab.length ? [`Use topic vocabulary in sentences: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Four levels with clear labels. Intonation guide. Answer key.",
+          output_lang: "Russian labels and notes, English exercise content"
+        })
+      },
+      {
+        id: "articles",
+        title: "Article Usage",
+        desc: "Выбрать или вставить правильный артикль",
+        emoji: "🔤",
+        tags: ["артикли", "грамматика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a comprehensive Article Usage practice set in the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Build 5 tasks:`,
+            `Task 1 (10 items): Choose a / an / the / — (no article).`,
+            `Task 2 (8 items): Insert articles in a running text.`,
+            `Task 3 (6 items): Explain why the article choice is correct (metalinguistic awareness).`,
+            `Task 4 (5 items): Error correction — wrong article used; correct it.`,
+            `Task 5: Write 6 sentences about the topic using all four article forms correctly.`,
+            `Include a rule summary with the 12 key article rules illustrated with topic-related examples.`,
+            `Focus on tricky cases: geographical names, unique nouns, abstract nouns, generalisations.`,
+            `Full answer key.`,
+            ...(d.vocab.length ? [`Use in context: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Five tasks. Rule summary box with examples. Detailed answer key.",
+          output_lang: "Russian rules and instructions, English exercise content"
+        })
+      },
+      {
+        id: "prepositions",
+        title: "Prepositions Practice",
+        desc: "Вставить подходящий предлог",
+        emoji: "🔧",
+        tags: ["предлоги", "грамматика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a rich Prepositions Practice activity in the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Design 4 task types:`,
+            `Task 1 — Prepositions of time/place/movement (8 sentences): insert the correct preposition.`,
+            `Task 2 — Prepositional phrases & collocations (8 items): verb/noun/adjective + preposition combinations.`,
+            `Task 3 — Phrasal verbs (6 items): topic-relevant phrasal verbs with the particle/preposition missing.`,
+            `Task 4 — Contextualised paragraph (10 gaps): prepositions removed from a connected passage.`,
+            `Include a "Preposition Collocation Map": 10 key topic words + their preposition partners.`,
+            `Common error analysis: 5 preposition errors Russian learners frequently make.`,
+            `Full answer key.`,
+            ...(d.vocab.length ? [`Build collocations around: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Four task types. Collocation map. Error analysis. Answer key.",
+          output_lang: "Russian notes and error analysis, English exercise content"
+        })
+      },
+      {
+        id: "comparatives",
+        title: "Degrees of Comparison",
+        desc: "Образовать сравнительную / превосходную степень",
+        emoji: "📊",
+        tags: ["сравнение", "грамматика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a thorough Degrees of Comparison exercise in the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Task 1 (8 items): Form comparative or superlative of adjective/adverb in brackets.`,
+            `Task 2 (6 items): Rewrite sentences using a comparative or superlative structure.`,
+            `Task 3 (5 items): Error correction — wrong degree form; correct it.`,
+            `Task 4 (6 items): Complete with as...as, less...than, the most, etc.`,
+            `Task 5: Write 5 comparative sentences about two things related to the topic.`,
+            `Include irregular forms reference table, double comparatives ("the more...the more..."), and intensifiers (much, far, slightly, by far).`,
+            `Full answer key with grammar notes.`,
+            ...(d.vocab.length ? [`Use these adjectives/adverbs in context: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Five tasks. Irregular forms table. Full answer key.",
+          output_lang: "Russian grammar notes, English exercise content"
+        })
+      },
+      {
+        id: "modals",
+        title: "Modal Verbs Exercises",
+        desc: "Использовать подходящий модальный глагол",
+        emoji: "🎯",
+        tags: ["модальные глаголы", "грамматика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a comprehensive Modal Verbs exercise set in the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Cover all modal meanings: ability, possibility, permission, obligation, advice, deduction, hypothesis.`,
+            `Task 1 (8 items): Choose the correct modal verb from 2–3 options.`,
+            `Task 2 (7 items): Rewrite sentences using the modal verb given in brackets.`,
+            `Task 3 (6 items): Error correction — wrong modal or wrong form used.`,
+            `Task 4 (5 items): Match situation description → appropriate modal sentence.`,
+            `Task 5: Write 6 modal sentences expressing your opinion on aspects of the topic.`,
+            `Include a Modal Meanings Reference Table: modal + meaning + example (for the given level).`,
+            `Focus on common confusion pairs: can/could, must/have to, should/ought to, may/might.`,
+            `Full answer key with explanation.`,
+            ...(d.vocab.length ? [`Contextualise with: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Five tasks. Modal reference table. Confusion pairs section. Answer key.",
+          output_lang: "Russian explanations and notes, English exercise content"
+        })
+      },
+      {
+        id: "conditionals",
+        title: "Conditional Sentences",
+        desc: "Построение условных предложений",
+        emoji: "🔀",
+        tags: ["условные предложения", "грамматика"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a comprehensive Conditional Sentences exercise in the context of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Cover: Zero, First, Second, Third conditionals + Mixed conditionals (for B2+).`,
+            `Task 1 (8 items): Complete the conditional sentence with the correct verb form.`,
+            `Task 2 (6 items): Match sentence halves to form logical conditionals.`,
+            `Task 3 (5 items): Transform the conditional type (e.g. 1st → 2nd, keeping meaning).`,
+            `Task 4 (4 items): Error correction in conditional sentences.`,
+            `Task 5 (5 items): Write full conditional sentences about the topic from prompts.`,
+            `Include variations: unless, provided that, as long as, on condition that.`,
+            `"Real World Conditionals" section: 5 authentic conditional structures from news/media on the topic.`,
+            `Full answer key.`,
+            ...(d.vocab.length ? [`Topic vocabulary to include: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Five tasks. Conditional types overview table. Variations box. Answer key.",
+          output_lang: "Russian grammar reference, English exercise content"
+        })
+      },
+    ]
+  },
+  {
+    id: 5,
+    emoji: "🎨",
+    color: "from-emerald-500 to-teal-600",
+    title: "Творческие задания",
+    fullTitle: "AI-инструменты для творческих заданий",
+    prompts: [
+      {
+        id: "char_profiles",
+        title: "Character Profiles",
+        desc: "Подробные описания вымышленных персонажей",
+        emoji: "👤",
+        tags: ["персонаж", "письмо"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create detailed, linguistically rich Character Profiles connected to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Design 3 fictional characters who are directly connected to the topic (e.g. professions, lifestyles, experiences).`,
+            `Each profile includes: full name + age + nationality + physical description + personality (adjectives + elaboration) + daily life + opinions on the topic + quote + "dark secret" or unusual fact.`,
+            `Use descriptively rich language appropriate for ${d.level}.`,
+            `After each profile: 5 questions about the character that could spark discussion.`,
+            `"Debate the Characters" task: which character's view on the topic do you agree with most?`,
+            `Student creative task: create your own character profile using a provided template.`,
+            ...(d.vocab.length ? [`Characters should use/reflect: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Demonstrate: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Profile cards with consistent structure. Discussion questions. Student template.",
+          output_lang: "Russian task instructions and discussion questions, English profile content"
+        })
+      },
+      {
+        id: "family_tree",
+        title: "Family Tree Generator",
+        desc: "Семейное древо с характеристиками членов",
+        emoji: "🌳",
+        tags: ["семья", "описание"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a creative Family Tree activity connected to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Generate a fictional family of 10 members across 3 generations, all connected to the topic.`,
+            `For each member: name, age, relationship, personality trait (adjective + example), connection to the topic, one memorable quote.`,
+            `Describe the family tree structure in text form (with clear relationships) so students can draw it.`,
+            `Language tasks: Task 1 — describe relationships using family vocabulary; Task 2 — write 5 comparative sentences about family members; Task 3 — write a 100-word paragraph about the "most interesting" member.`,
+            `Include a speaking task: "Guess My Family Member" (20 questions game).`,
+            ...(d.vocab.length ? [`Family members' professions/interests relate to: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Target structures: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Text-based family tree. Character mini-profiles. Three language tasks. Speaking task.",
+          output_lang: "Russian task instructions, English character and family content"
+        })
+      },
+      {
+        id: "daily_routines",
+        title: "Daily Routines Generator",
+        desc: "Тексты о распорядке дня персонажей",
+        emoji: "⏰",
+        tags: ["распорядок", "рутина"],
+        generate: (d) => buildPrompt(d, {
+          task: `Write imaginative Daily Routine texts connected to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 3 daily routine texts (150–200 words each) for: (1) a fictional character/celebrity deeply involved in the topic, (2) an unusual/unexpected character (e.g. if topic is Travel, maybe a travel-phobic person), (3) an idealised version of the student themselves.`,
+            `Use a rich variety of time expressions, adverbs of frequency, and topic vocabulary.`,
+            `For each routine: comprehension questions (3), find-the-expression task (3 items), "What would you change?" discussion prompt.`,
+            `Include a "My Ideal Routine" writing template with sentence starters.`,
+            `Language focus box: time connectors, frequency adverbs, and sequencing language.`,
+            ...(d.vocab.length ? [`Incorporate: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Grammar structures to highlight: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Three texts. Tasks below each. Writing template at end.",
+          output_lang: "Russian task instructions, English routine content"
+        })
+      },
+      {
+        id: "celebrity_pov",
+        title: "Celebrity Point of View",
+        desc: "Тексты от лица знаменитостей по теме",
+        emoji: "⭐",
+        tags: ["знаменитости", "письмо"],
+        generate: (d) => buildPrompt(d, {
+          task: `Write engaging first-person texts from the perspective of famous people, connected to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Choose 3 well-known figures (from different eras/fields) who can plausibly relate to the topic.`,
+            `Each text: 150–180 words, authentic voice mimicking the celebrity's known personality/speaking style, rich topic vocabulary, at least one famous quote or referenced fact.`,
+            `After each text: Who am I? (students guess), 3 comprehension questions, "Do you agree with this viewpoint?" discussion.`,
+            `"Write Your Own" task: students choose a celebrity and write 100 words in their voice.`,
+            `Language focus: reported speech, first-person perspective language, hedging expressions.`,
+            ...(d.vocab.length ? [`Include: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "First-person texts. Identity reveal after tasks. Writing task with template.",
+          output_lang: "Russian task instructions, English celebrity text content"
+        })
+      },
+      {
+        id: "mad_libs",
+        title: "Mad Libs",
+        desc: "История с пропусками — вставить части речи",
+        emoji: "🎲",
+        tags: ["игра", "части речи"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a hilarious Mad Libs activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Write 3 Mad Libs stories (100–150 words each): Story 1 — narrative, Story 2 — news article, Story 3 — formal letter or report.`,
+            `Each story: 20+ blanks labelled by part of speech (NOUN, VERB, ADJECTIVE, ADVERB, NUMBER, PROPER NOUN, EXCLAMATION, etc.).`,
+            `Word collection sheet: students fill in words before seeing the story (for maximum comedy).`,
+            `After reading: identify the real vocabulary from the topic that was replaced + learn 5 original words.`,
+            `Grammar boost: category explanations for students who need a reminder of parts of speech.`,
+            `"Academic Mad Libs" extension: a more formal version for higher-level students.`,
+            ...(d.vocab.length ? [`Preserve these words in the story (don't replace them): ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Word collection sheet + story with blanks. Both versions for each story.",
+          output_lang: "Russian parts of speech labels and instructions, English story content"
+        })
+      },
+      {
+        id: "emoji_writing",
+        title: "Emoji Writing Challenge",
+        desc: "Написать историю по набору эмодзи",
+        emoji: "✍️",
+        tags: ["эмодзи", "письмо"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a creative Emoji Writing Challenge on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 5 Emoji Story Prompts: provide a sequence of 8–12 emoji for each, from which students write a story/text.`,
+            `Vary text types: narrative (2), descriptive (1), argumentative (1), informative (1).`,
+            `For each prompt: emoji sequence + suggested word count + 3 vocabulary words to incorporate + grammar structure to practise.`,
+            `"Reverse Challenge": student writes a passage, then converts it to emoji — partner decodes it.`,
+            `Assessment criteria: coherence, vocabulary use, grammar accuracy, creativity.`,
+            `Model answer for one prompt showing excellent language use.`,
+            ...(d.vocab.length ? [`Required vocabulary to incorporate: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Grammar focus: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Five emoji prompt cards. Reverse challenge instructions. Model answer. Assessment criteria.",
+          output_lang: "Russian assessment criteria and instructions, English prompt content"
+        })
+      },
+      {
+        id: "restaurant_menu",
+        title: "Restaurant Menu Generator",
+        desc: "Меню выдуманного ресторана",
+        emoji: "🍽️",
+        tags: ["ресторан", "творчество"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a creative Restaurant Menu activity thematically linked to "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Invent a fictional restaurant with: name + concept/theme connected to the topic + tagline + atmosphere description.`,
+            `Create a full menu: Starters (4 dishes), Mains (6 dishes), Desserts (4 dishes), Drinks (4), Chef's Special (1).`,
+            `Each dish: creative name (linked to topic), vivid description (50–70 words), price, dietary tags (vegan/gluten-free etc.), adjective-rich language.`,
+            `Language tasks: Task 1 — find adjectives and categorise them; Task 2 — write a customer review (100 words); Task 3 — role play ordering scene using the menu.`,
+            `Creative extension: student designs their own 3-course menu on the topic.`,
+            ...(d.vocab.length ? [`Link menu items/descriptions to: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Professional menu design in text. Language tasks below. Student design template.",
+          output_lang: "Russian task instructions, English menu content"
+        })
+      },
+      {
+        id: "bucket_list",
+        title: "Bucket List Generator",
+        desc: "Тематические чек-листы и идеи",
+        emoji: "✅",
+        tags: ["чек-лист", "идеи"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create an engaging Bucket List activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Generate 3 thematic bucket lists (20 items each): List 1 — things to do, List 2 — things to experience/feel, List 3 — things to learn/know.`,
+            `Each item: short, inspiring, grammatically varied (infinitives, gerunds, noun phrases), appropriate vocabulary.`,
+            `Language tasks: Task 1 — rank top 5 + justify; Task 2 — add 3 items of your own; Task 3 — write "I have already...", "I haven't... yet", "I'm going to...".`,
+            `"Bucket List Interview" speaking task: pairs interview each other about their lists.`,
+            `Grammar spotlight: present perfect for experience, going to/will for plans, wish/hope structures.`,
+            ...(d.vocab.length ? [`Base list items on: ${d.vocab.join(', ')}.`] : []),
+            ...(d.grammar.length ? [`Grammar focus: ${d.grammar.join(', ')}.`] : []),
+          ],
+          format: "Three lists. Language tasks. Speaking task. Grammar spotlight box.",
+          output_lang: "Russian task instructions and grammar notes, English list content"
+        })
+      },
+      {
+        id: "photo_challenge",
+        title: "Photo Challenge Ideas",
+        desc: "Идеи для фотографий по теме",
+        emoji: "📸",
+        tags: ["фото", "проект"],
+        generate: (d) => buildPrompt(d, {
+          task: `Design a creative Photo Challenge activity on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Create 3 photo challenge packs:`,
+            `Pack 1 — "In Class" (10 photo ideas): things to find/create/photograph in the classroom.`,
+            `Pack 2 — "In the City/Neighbourhood" (10 ideas): real-world photo hunt.`,
+            `Pack 3 — "Online/Social" (8 ideas): screen captures, digital creativity.`,
+            `Each photo idea: what to photograph + caption requirement (with vocabulary) + description task (50 words) + discussion question.`,
+            `Photo presentation task: students present 3 photos to the class using specific language structures.`,
+            `Assessment rubric: vocabulary use, descriptive language, originality, presentation skill.`,
+            ...(d.vocab.length ? [`Require use of: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Three packs. Photo idea cards. Presentation task. Assessment rubric.",
+          output_lang: "Russian task instructions and rubric, English photo challenge content"
+        })
+      },
+      {
+        id: "scavenger_hunt",
+        title: "Scavenger Hunt Generator",
+        desc: "Списки предметов для «находилок»",
+        emoji: "🔎",
+        tags: ["игра", "поиск"],
+        generate: (d) => buildPrompt(d, {
+          task: `Create a comprehensive Scavenger Hunt activity connected to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
+          requirements: [
+            `Design 4 scavenger hunt variants: (1) Classroom Hunt (15 items), (2) Digital/Online Hunt (12 items), (3) Vocabulary Hunt in a Text (10 items), (4) Knowledge Hunt (10 trivia-style questions).`,
+            `Each hunt item: what to find + language task when found (e.g. "Find something red and describe it in 2 sentences using vocabulary from today's lesson").`,
+            `Points system: standard items (1pt), creative/unexpected finds (2pts), bonus challenges (3pts).`,
+            `"Hunt Debrief": whole-class sharing using structured language ("I found...", "This reminded me of...", "The most surprising was...").`,
+            `Team vs. individual variants with timing suggestions.`,
+            ...(d.vocab.length ? [`Hunt items and tasks should connect to: ${d.vocab.join(', ')}.`] : []),
+          ],
+          format: "Four hunt variants. Points system. Debrief task. Team/individual variants.",
+          output_lang: "Russian game instructions and debrief prompts, English hunt content"
+        })
+      },
+    ]
+  }
+];
+
+// =============================================
+// STATE
+// =============================================
+let state = {
+  lang: "English",
+  level: "B1 (Intermediate)",
+  age: "adult learner",
+  format: "individual (one-to-one) lesson",
+  vocab: [],
+  grammar: [],
+  topic: "",
+  studentDesc: "",
+  extraContext: "",
+  selectedSection: null,
+  selectedPrompt: null,
+  currentStep: 1
+};
+
+// =============================================
+// PROMPT BUILDER
+// =============================================
+function buildPrompt(d, config) {
+  const studentInfo = [
+    `Language: ${d.lang}`,
+    `Level: ${d.level}`,
+    `Learner profile: ${d.age}`,
+    `Lesson format: ${d.format}`,
+    d.studentDesc ? `Student notes: ${d.studentDesc}` : null,
+    `Lesson topic: ${d.topic}`,
+    d.vocab.length ? `Key vocabulary: ${d.vocab.join(', ')}` : null,
+    d.grammar.length ? `Grammar focus: ${d.grammar.join(', ')}` : null,
+    d.extraContext ? `Additional context: ${d.extraContext}` : null,
+  ].filter(Boolean).join('\n');
+
+  const reqText = config.requirements.map((r, i) => `${i + 1}. ${r}`).join('\n');
+
+  return `You are an expert ${d.lang} language teacher and materials designer with 20+ years of experience. Your task is to create a professional, pedagogically sound, and highly engaging classroom activity.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 LEARNER & LESSON CONTEXT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${studentInfo}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 TASK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${config.task}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${reqText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📐 FORMAT & OUTPUT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${config.format}
+Output language: ${config.output_lang}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️ QUALITY STANDARDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Ensure all content is level-appropriate and learner-centred.
+• Every exercise item must be meaningful and test real language knowledge — avoid trick questions.
+• Use authentic, natural English (avoid textbook-sounding sentences).
+• Include variety in sentence structures and task types.
+• Make the material genuinely engaging and relevant to the student's interests and profile.
+• If the student description mentions specific interests or challenges, reflect these in the content.`;
+}
+
+// =============================================
+// STEP MANAGEMENT
+// =============================================
+function renderSteps(current) {
+  const steps = [
+    { n: 1, label: "Анкета" },
+    { n: 2, label: "Инструмент" },
+    { n: 3, label: "Промт" }
+  ];
+  const el = document.getElementById('stepIndicator');
+  el.innerHTML = steps.map((s, i) => {
+    let cls = s.n < current ? 'done' : s.n === current ? 'active' : 'inactive';
+    let icon = s.n < current ? '✓' : s.n;
+    let line = i < steps.length - 1 ? `<div class="step-line ${s.n < current ? 'done' : ''}"></div>` : '';
+    return `
+      <div class="flex flex-col items-center">
+        <div class="step-dot ${cls} ${cls === 'active' ? 'pulse-ring' : ''}">${icon}</div>
+        <div class="text-xs mt-1 ${cls === 'active' ? 'text-violet-400 font-600' : cls === 'done' ? 'text-emerald-400' : 'text-white/30'}">${s.label}</div>
+      </div>
+      ${line}
+    `;
+  }).join('');
+}
+
+function showStep(n) {
+  [1, 2, 3].forEach(i => {
+    const el = document.getElementById(`step${i}`);
+    if (i === n) {
+      el.classList.remove('hidden');
+      el.classList.add('fade-in');
+    } else {
+      el.classList.add('hidden');
+      el.classList.remove('fade-in');
+    }
+  });
+  renderSteps(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =============================================
+// COLLECT STATE
+// =============================================
+function collectStep1() {
+  state.topic = document.getElementById('lessonTopic').value.trim();
+  state.studentDesc = document.getElementById('studentDesc').value.trim();
+  state.extraContext = document.getElementById('extraContext').value.trim();
+}
+
+function goToStep2() {
+  collectStep1();
+  if (!state.topic) {
+    document.getElementById('lessonTopic').focus();
+    document.getElementById('lessonTopic').style.borderColor = '#f472b6';
+    setTimeout(() => document.getElementById('lessonTopic').style.borderColor = '', 2000);
+    return;
+  }
+  renderSections();
+  showStep(2);
+  state.currentStep = 2;
+}
+
+function goToStep1() {
+  showStep(1);
+  state.currentStep = 1;
+}
+
+function goToStep3() {
+  if (!state.selectedPrompt) return;
+  generateFinalPrompt();
+  showStep(3);
+  state.currentStep = 3;
+}
+
+// =============================================
+// SECTIONS & PROMPTS RENDER
+// =============================================
+function renderSections() {
+  const container = document.getElementById('sectionList');
+  container.innerHTML = SECTIONS.map(s => `
+    <div class="section-card ${state.selectedSection === s.id ? 'active' : ''}"
+         onclick="selectSection(${s.id})">
+      <div class="flex items-center gap-3">
+        <div class="section-icon bg-gradient-to-br ${s.color} opacity-90">
+          ${s.emoji}
+        </div>
+        <div>
+          <div class="font-600 text-sm text-white">${s.title}</div>
+          <div class="text-xs text-white/45 mt-0.5">${s.prompts.length} инструментов</div>
+        </div>
+        <div class="ml-auto text-white/30 text-sm">›</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectSection(id) {
+  state.selectedSection = id;
+  state.selectedPrompt = null;
+  document.getElementById('generateBtn').disabled = true;
+  renderSections();
+  renderPrompts(id);
+}
+
+function renderPrompts(sectionId) {
+  const section = SECTIONS.find(s => s.id === sectionId);
+  const container = document.getElementById('promptList');
+  container.innerHTML = section.prompts.map(p => `
+    <div class="prompt-card ${state.selectedPrompt === p.id ? 'active' : ''}"
+         onclick="selectPrompt('${p.id}', ${sectionId})">
+      <div class="flex items-start gap-3">
+        <span class="text-xl mt-0.5">${p.emoji}</span>
+        <div>
+          <div class="font-600 text-sm text-white">${p.title}</div>
+          <div class="text-xs text-white/50 mt-0.5">${p.desc}</div>
+          <div class="flex flex-wrap gap-1 mt-2">
+            ${p.tags.map(t => `<span class="text-xs px-2 py-0.5 rounded-full bg-white/8 text-white/40">${t}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectPrompt(promptId, sectionId) {
+  state.selectedPrompt = promptId;
+  renderPrompts(sectionId);
+  document.getElementById('generateBtn').disabled = false;
+}
+
+// =============================================
+// GENERATE PROMPT
+// =============================================
+function generateFinalPrompt() {
+  const section = SECTIONS.find(s => s.id === state.selectedSection);
+  const prompt = section.prompts.find(p => p.id === state.selectedPrompt);
+
+  const d = {
+    lang: state.lang,
+    level: state.level,
+    age: state.age,
+    format: state.format,
+    vocab: state.vocab,
+    grammar: state.grammar,
+    topic: state.topic,
+    studentDesc: state.studentDesc,
+    extraContext: state.extraContext
+  };
+
+  const result = prompt.generate(d);
+  document.getElementById('resultBox').textContent = result;
+
+  document.getElementById('resultMeta').textContent =
+    `${section.emoji} ${section.title} → ${prompt.emoji} ${prompt.title}`;
+
+  // tags
+  const tags = [
+    { label: state.lang, icon: '🌐' },
+    { label: state.level, icon: '📊' },
+    { label: state.topic, icon: '📌' },
+    ...(state.vocab.length ? [{ label: `${state.vocab.length} слов лексики`, icon: '📝' }] : []),
+    ...(state.grammar.length ? [{ label: state.grammar[0], icon: '📐' }] : []),
+  ];
+  document.getElementById('resultTags').innerHTML = tags.map(t =>
+    `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-500" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);">${t.icon} ${t.label}</span>`
+  ).join('');
+
+  // tips
+  const tips = [
+    { icon: '💡', text: 'Скопируйте промт и вставьте в ChatGPT 4o, Claude или Gemini Advanced' },
+    { icon: '🎯', text: 'Чем точнее описание ученика, тем более персонализированным будет результат' },
+    { icon: '🔄', text: 'Попробуйте регенерировать ответ 2–3 раза для разных вариантов материала' },
+    { icon: '✂️', text: 'Адаптируйте готовый материал — добавьте или уберите задания под урок' },
+    { icon: '📎', text: 'Добавьте в промт реальный текст или список слов для точного контекста' },
+    { icon: '🗣️', text: 'Попросите AI объяснить ответы ключа или дать варианты заданий сложнее/проще' },
+  ];
+  document.getElementById('tipsBox').innerHTML = tips.map(t =>
+    `<div class="flex items-start gap-2 p-3 rounded-xl" style="background:rgba(255,255,255,0.04)">
+      <span class="text-base flex-shrink-0">${t.icon}</span>
+      <span class="text-sm text-white/60">${t.text}</span>
+    </div>`
+  ).join('');
+}
+
+// =============================================
+// COPY
+// =============================================
+function copyPrompt() {
+  const text = document.getElementById('resultBox').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.innerHTML = '<span>✅</span> Скопировано!';
+    setTimeout(() => { btn.innerHTML = '<span>📋</span> Копировать'; }, 2500);
+  });
+}
+
+// =============================================
+// TAG BUTTONS (radio-like)
+// =============================================
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-group]');
+  if (!btn) return;
+  const group = btn.dataset.group;
+  const val = btn.dataset.val;
+  document.querySelectorAll(`[data-group="${group}"]`).forEach(b => {
+    b.classList.remove('selected', 'sel');
+  });
+  if (group === 'level') {
+    btn.classList.add('sel');
+  } else {
+    btn.classList.add('selected');
+  }
+  state[group] = val;
+});
+
+// =============================================
+// TOPIC QUICK SELECT
+// =============================================
+function setTopic(val) {
+  document.getElementById('lessonTopic').value = val;
+  state.topic = val;
+}
+
+// =============================================
+// VOCAB CHIPS
+// =============================================
+function addVocab() {
+  const input = document.getElementById('vocabInput');
+  const val = input.value.trim();
+  if (!val || state.vocab.includes(val)) { input.value = ''; return; }
+  state.vocab.push(val);
+  input.value = '';
+  renderChips('vocab');
+}
+
+function addGrammar() {
+  const input = document.getElementById('grammarInput');
+  const val = input.value.trim();
+  if (!val || state.grammar.includes(val)) { input.value = ''; return; }
+  state.grammar.push(val);
+  input.value = '';
+  renderChips('grammar');
+}
+
+function addGrammarTag(val) {
+  if (state.grammar.includes(val)) return;
+  state.grammar.push(val);
+  renderChips('grammar');
+}
+
+function removeChip(type, val) {
+  state[type] = state[type].filter(v => v !== val);
+  renderChips(type);
+}
+
+function renderChips(type) {
+  const container = document.getElementById(`${type}Chips`);
+  container.innerHTML = state[type].map(v =>
+    `<span class="chip">${v}<button onclick="removeChip('${type}','${v.replace(/'/g, "\\'")}')">×</button></span>`
+  ).join('');
+}
+
+// =============================================
+// INIT
+// =============================================
+renderSteps(1);
+</script>
+</body>
+</html>
