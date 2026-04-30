@@ -512,7 +512,7 @@ const SECTIONS = [
           task: `Create a comprehensive, pedagogically structured word list on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
           requirements: [
             `Include 20–25 carefully selected lexical items (nouns, verbs, adjectives, adverbs, collocations, phrasal verbs) that are highly relevant to the topic.`,
-            `For each item provide: the word/phrase, its part of speech, a clear and concise definition in ${d.level.includes('A') ? 'simple English' : 'English'}, a natural example sentence in context, and a Russian translation.`,
+            `For each item provide: the word/phrase, its part of speech, a clear and concise definition in ${d.level.includes('A') ? 'simple ' + d.lang : d.lang}, a natural example sentence in context, and a translation into the teacher's language (${d.tl || 'Russian'}).`,
             `Group words into 3–4 thematic subcategories for better organisation and retention.`,
             `Mark items that are particularly useful for spoken communication with a 🗣️ symbol.`,
             `Mark B2+ items or less common but high-value words with a ⭐ symbol.`,
@@ -1062,7 +1062,7 @@ const SECTIONS = [
             `Each card: TARGET WORD (large) + 5 taboo words below it (the most obvious synonyms/related words to avoid).`,
             `Include 3 difficulty levels: Easy (10 cards), Medium (12 cards), Hard (8 cards) — with harder taboo restrictions as difficulty increases.`,
             `Add a variation: "Silent Taboo" (mime-only version) and "Written Taboo" (write a definition without the taboo words).`,
-            `Include complete game rules in simple English.`,
+            `Include complete game rules written simply in the teacher's language (${d.tl || 'Russian'}).`,
             `Teacher notes: how to use for both production and receptive vocabulary practice.`,
             ...(d.vocab.length ? [`Include these as target words: ${d.vocab.join(', ')}.`] : []),
           ],
@@ -1595,22 +1595,51 @@ let state = {
 // =============================================
 // PROMPT BUILDER
 // =============================================
+// =============================================
+// LANGUAGE LABEL MAP
+// =============================================
+const LANG_LABELS = {
+  "English":  { native: "English",  teacher: "Russian"  },
+  "German":   { native: "German",   teacher: "Russian"  },
+  "French":   { native: "French",   teacher: "Russian"  },
+  "Spanish":  { native: "Spanish",  teacher: "Russian"  },
+  "Italian":  { native: "Italian",  teacher: "Russian"  },
+  "Chinese":  { native: "Chinese (Mandarin)", teacher: "Russian" },
+};
+
+function getOutputLang(d, role) {
+  // role: "instructions" = teacher-facing text lang; "content" = target language
+  const info = LANG_LABELS[d.lang] || { native: d.lang, teacher: "Russian" };
+  if (role === "instructions") return info.teacher;
+  if (role === "content") return info.native;
+  // default: instructions in teacher lang, target content in lesson lang
+  return `${info.teacher} (teacher instructions, task labels, explanations, translations) + ${info.native} (all exercise content, examples, texts, vocabulary)`;
+}
+
 function buildPrompt(d, config) {
+  const info = LANG_LABELS[d.lang] || { native: d.lang, teacher: "Russian" };
+  const tl = info.teacher; // teacher language (for instructions)
+  const nl = info.native;  // native/target language (for content)
+  const outputLangLine = `Write ALL teacher-facing instructions, task headings, labels, explanations, answer keys, and translations in ${tl}. Write ALL exercise content, example sentences, vocabulary, texts, dialogues, and target-language material in ${nl}.`;
+
   const studentInfo = [
-    `Language: ${d.lang}`,
-    `Level: ${d.level}`,
+    `Target language: ${d.lang}`,
+    `Learner level: ${d.level}`,
     `Learner profile: ${d.age}`,
     `Lesson format: ${d.format}`,
     d.studentDesc ? `Student notes: ${d.studentDesc}` : null,
     `Lesson topic: ${d.topic}`,
-    d.vocab.length ? `Key vocabulary: ${d.vocab.join(', ')}` : null,
+    d.vocab.length ? `Key vocabulary to include: ${d.vocab.join(', ')}` : null,
     d.grammar.length ? `Grammar focus: ${d.grammar.join(', ')}` : null,
-    d.extraContext ? `Additional context: ${d.extraContext}` : null,
+    d.extraContext ? `Additional context / teacher wishes: ${d.extraContext}` : null,
   ].filter(Boolean).join('\n');
 
-  const reqText = config.requirements.map((r, i) => `${i + 1}. ${r}`).join('\n');
+  // Replace any hardcoded "Russian" in requirements with the actual teacher language
+  const reqText = config.requirements
+    .map((r, i) => `${i + 1}. ${r.replace(/\bRussian\b/g, tl)}`)
+    .join('\n');
 
-  return `You are an expert ${d.lang} language teacher and materials designer with 20+ years of experience. Your task is to create a professional, pedagogically sound, and highly engaging classroom activity.
+  return `You are an expert ${nl} language teacher and materials designer with 20+ years of experience. Your task is to create a professional, pedagogically sound, and highly engaging classroom activity.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📌 LEARNER & LESSON CONTEXT
@@ -1628,17 +1657,17 @@ ${config.task}
 ${reqText}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📐 FORMAT & OUTPUT
+📐 FORMAT & OUTPUT LANGUAGE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${config.format}
-Output language: ${config.output_lang}
+${outputLangLine}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚙️ QUALITY STANDARDS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 • Ensure all content is level-appropriate and learner-centred.
 • Every exercise item must be meaningful and test real language knowledge — avoid trick questions.
-• Use authentic, natural English (avoid textbook-sounding sentences).
+• Use authentic, natural ${d.lang} (avoid textbook-sounding sentences).
 • Include variety in sentence structures and task types.
 • Make the material genuinely engaging and relevant to the student's interests and profile.
 • If the student description mentions specific interests or challenges, reflect these in the content.`;
@@ -1780,6 +1809,7 @@ function generateFinalPrompt() {
   const section = SECTIONS.find(s => s.id === state.selectedSection);
   const prompt = section.prompts.find(p => p.id === state.selectedPrompt);
 
+  const info = LANG_LABELS[state.lang] || { native: state.lang, teacher: "Russian" };
   const d = {
     lang: state.lang,
     level: state.level,
@@ -1789,7 +1819,9 @@ function generateFinalPrompt() {
     grammar: state.grammar,
     topic: state.topic,
     studentDesc: state.studentDesc,
-    extraContext: state.extraContext
+    extraContext: state.extraContext,
+    tl: info.teacher,   // teacher language
+    nl: info.native,    // target/native language
   };
 
   const result = prompt.generate(d);
