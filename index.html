@@ -512,7 +512,7 @@ const SECTIONS = [
           task: `Create a comprehensive, pedagogically structured word list on the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
           requirements: [
             `Include 20–25 carefully selected lexical items (nouns, verbs, adjectives, adverbs, collocations, phrasal verbs) that are highly relevant to the topic.`,
-            `For each item provide: the word/phrase, its part of speech, a clear and concise definition in ${d.level.includes('A') ? 'simple ' + d.lang : d.lang}, a natural example sentence in context, and a translation into the teacher's language (${d.tl || 'Russian'}).`,
+            `For each item provide: the word/phrase, its part of speech, a clear and concise definition in ${d.level.includes('A') ? 'simple ' + d.lang : d.lang}, a natural example sentence in context, and a Russian translation (Перевод).`,
             `Group words into 3–4 thematic subcategories for better organisation and retention.`,
             `Mark items that are particularly useful for spoken communication with a 🗣️ symbol.`,
             `Mark B2+ items or less common but high-value words with a ⭐ symbol.`,
@@ -533,7 +533,7 @@ const SECTIONS = [
           task: `Generate a curated set of idioms, fixed expressions, and figurative phrases related to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
           requirements: [
             `Select 10–12 idioms that are: (a) authentically used by native speakers, (b) appropriate for the learner's level (prefer well-known idioms for A/B levels, rarer ones for C level).`,
-            `For each idiom provide: the idiom in bold, its literal meaning (if helpful), its actual figurative meaning, 2 natural example sentences (one neutral, one conversational), register label (formal / informal / neutral), and a Russian translation.`,
+            `For each idiom provide: the idiom in bold, its literal meaning (if helpful), its actual figurative meaning, 2 natural example sentences (one neutral, one conversational), register label (formal / informal / neutral), and a Russian translation (Перевод).`,
             `Include a brief "Origin / Fun Fact" note for 3–4 of the most interesting idioms to boost memorability.`,
             `Add a mini-quiz at the end: 5 gap-fill sentences where students must insert the correct idiom.`,
             ...(d.vocab.length ? [`Try to incorporate or connect to these words/phrases if possible: ${d.vocab.join(', ')}.`] : []),
@@ -852,7 +852,7 @@ const SECTIONS = [
           task: `Create a professional learner's glossary of key vocabulary related to the topic of "${d.topic}" for a ${d.level} ${d.lang} learner.`,
           requirements: [
             `Select 25–30 high-value lexical items from the topic.`,
-            `For each entry: headword + phonetic transcription (IPA) + part of speech + definition in English + Russian translation + example sentence + common collocations (2–3) + register label.`,
+            `For each entry: headword + phonetic transcription (IPA) + part of speech + definition in ${d.lang} + Russian translation (Перевод) + example sentence + common collocations (2–3) + register label.`,
             `Organise in alphabetical order AND provide a second version organised thematically.`,
             `Add a "Word Family" section for 8 key words (e.g. travel → traveller, travelling, travellable).`,
             `Include a self-testing grid at the end (word | cover definition | cover translation | cover example).`,
@@ -1062,7 +1062,7 @@ const SECTIONS = [
             `Each card: TARGET WORD (large) + 5 taboo words below it (the most obvious synonyms/related words to avoid).`,
             `Include 3 difficulty levels: Easy (10 cards), Medium (12 cards), Hard (8 cards) — with harder taboo restrictions as difficulty increases.`,
             `Add a variation: "Silent Taboo" (mime-only version) and "Written Taboo" (write a definition without the taboo words).`,
-            `Include complete game rules written simply in the teacher's language (${d.tl || 'Russian'}).`,
+            `Include complete game rules in simple ${d.lang}.`,
             `Teacher notes: how to use for both production and receptive vocabulary practice.`,
             ...(d.vocab.length ? [`Include these as target words: ${d.vocab.join(', ')}.`] : []),
           ],
@@ -1593,84 +1593,296 @@ let state = {
 };
 
 // =============================================
-// PROMPT BUILDER
+// LANGUAGE TRANSLATIONS FOR PROMPT
 // =============================================
-// =============================================
-// LANGUAGE LABEL MAP
-// =============================================
-const LANG_LABELS = {
-  "English":  { native: "English",  teacher: "Russian"  },
-  "German":   { native: "German",   teacher: "Russian"  },
-  "French":   { native: "French",   teacher: "Russian"  },
-  "Spanish":  { native: "Spanish",  teacher: "Russian"  },
-  "Italian":  { native: "Italian",  teacher: "Russian"  },
-  "Chinese":  { native: "Chinese (Mandarin)", teacher: "Russian" },
+const LANG_META = {
+  "English": {
+    code: "English",
+    nativeName: "English",
+    promptLang: "English",
+    tr: {
+      role: "You are an expert English language teacher and educational materials designer with 20+ years of experience. Your task is to create a professional, pedagogically sound, and highly engaging classroom activity.",
+      section_context: "📌 LEARNER & LESSON CONTEXT",
+      section_task: "🎯 TASK",
+      section_req: "📋 REQUIREMENTS",
+      section_format: "📐 FORMAT & OUTPUT",
+      section_quality: "⚙️ QUALITY STANDARDS",
+      f_language: "Language",
+      f_level: "Level",
+      f_profile: "Learner profile",
+      f_format: "Lesson format",
+      f_student: "Student notes",
+      f_topic: "Lesson topic",
+      f_vocab: "Key vocabulary",
+      f_grammar: "Grammar focus",
+      f_extra: "Additional context",
+      output_instr: "Task instructions: Russian. All exercise content, texts, vocabulary: English.",
+      quality: [
+        "Ensure all content is level-appropriate and learner-centred.",
+        "Every exercise item must be meaningful and test real language knowledge — avoid trick questions.",
+        "Use authentic, natural English — avoid textbook-sounding sentences.",
+        "Include variety in sentence structures and task types.",
+        "Make the material genuinely engaging and relevant to the student's profile.",
+        "If the student description mentions specific interests or challenges, reflect these in the content."
+      ]
+    }
+  },
+  "German": {
+    code: "German",
+    nativeName: "Deutsch",
+    promptLang: "German",
+    tr: {
+      role: "Du bist ein erfahrener Deutschlehrer und Bildungsmaterialentwickler mit mehr als 20 Jahren Erfahrung. Deine Aufgabe ist es, eine professionelle, pädagogisch fundierte und hochgradig motivierende Unterrichtsaktivität zu erstellen.",
+      section_context: "📌 LERNKONTEXT & UNTERRICHTSINFO",
+      section_task: "🎯 AUFGABE",
+      section_req: "📋 ANFORDERUNGEN",
+      section_format: "📐 FORMAT & AUSGABE",
+      section_quality: "⚙️ QUALITÄTSSTANDARDS",
+      f_language: "Sprache",
+      f_level: "Niveau",
+      f_profile: "Lernerprofil",
+      f_format: "Unterrichtsformat",
+      f_student: "Notizen zum Lernenden",
+      f_topic: "Unterrichtsthema",
+      f_vocab: "Schlüsselvokabular",
+      f_grammar: "Grammatikschwerpunkt",
+      f_extra: "Zusätzlicher Kontext",
+      output_instr: "Aufgabenanweisungen: auf Russisch. Alle Übungsinhalte, Texte und Vokabular: auf Deutsch.",
+      quality: [
+        "Alle Inhalte müssen niveaugerecht und lernerzentriert sein.",
+        "Jede Übungsaufgabe muss sinnvoll sein und echtes Sprachkönnen testen — keine Fangfragen.",
+        "Authentisches, natürliches Deutsch verwenden — keine lehrbuchhaften Sätze.",
+        "Abwechslung in Satzstrukturen und Aufgabentypen einbauen.",
+        "Das Material soll wirklich ansprechend und relevant für das Profil des Lernenden sein.",
+        "Wenn die Beschreibung des Lernenden spezifische Interessen oder Schwächen erwähnt, diese im Inhalt berücksichtigen."
+      ]
+    }
+  },
+  "French": {
+    code: "French",
+    nativeName: "Français",
+    promptLang: "French",
+    tr: {
+      role: "Vous êtes un professeur de français expert et concepteur de matériaux pédagogiques avec plus de 20 ans d'expérience. Votre tâche est de créer une activité de classe professionnelle, pédagogiquement solide et très engageante.",
+      section_context: "📌 CONTEXTE DE L'APPRENANT ET DU COURS",
+      section_task: "🎯 TÂCHE",
+      section_req: "📋 EXIGENCES",
+      section_format: "📐 FORMAT ET SORTIE",
+      section_quality: "⚙️ NORMES DE QUALITÉ",
+      f_language: "Langue",
+      f_level: "Niveau",
+      f_profile: "Profil de l'apprenant",
+      f_format: "Format du cours",
+      f_student: "Notes sur l'apprenant",
+      f_topic: "Sujet du cours",
+      f_vocab: "Vocabulaire clé",
+      f_grammar: "Point de grammaire",
+      f_extra: "Contexte supplémentaire",
+      output_instr: "Instructions des tâches : en russe. Tout le contenu des exercices, textes et vocabulaire : en français.",
+      quality: [
+        "Tout le contenu doit être adapté au niveau et centré sur l'apprenant.",
+        "Chaque exercice doit être significatif et tester de vraies connaissances linguistiques — éviter les questions pièges.",
+        "Utiliser un français authentique et naturel — éviter les phrases de manuel.",
+        "Inclure de la variété dans les structures de phrases et les types de tâches.",
+        "Le matériel doit être vraiment engageant et pertinent pour le profil de l'apprenant.",
+        "Si la description mentionne des intérêts ou des difficultés spécifiques, les refléter dans le contenu."
+      ]
+    }
+  },
+  "Spanish": {
+    code: "Spanish",
+    nativeName: "Español",
+    promptLang: "Spanish",
+    tr: {
+      role: "Eres un profesor de español experto y diseñador de materiales educativos con más de 20 años de experiencia. Tu tarea es crear una actividad de clase profesional, pedagógicamente sólida y altamente atractiva.",
+      section_context: "📌 CONTEXTO DEL ALUMNO Y LA LECCIÓN",
+      section_task: "🎯 TAREA",
+      section_req: "📋 REQUISITOS",
+      section_format: "📐 FORMATO Y SALIDA",
+      section_quality: "⚙️ ESTÁNDARES DE CALIDAD",
+      f_language: "Idioma",
+      f_level: "Nivel",
+      f_profile: "Perfil del alumno",
+      f_format: "Formato de la clase",
+      f_student: "Notas sobre el alumno",
+      f_topic: "Tema de la lección",
+      f_vocab: "Vocabulario clave",
+      f_grammar: "Enfoque gramatical",
+      f_extra: "Contexto adicional",
+      output_instr: "Instrucciones de tareas: en ruso. Todo el contenido de ejercicios, textos y vocabulario: en español.",
+      quality: [
+        "Todo el contenido debe ser apropiado para el nivel y centrado en el alumno.",
+        "Cada ejercicio debe ser significativo y evaluar conocimiento lingüístico real — evitar preguntas trampa.",
+        "Usar español auténtico y natural — evitar frases de manual.",
+        "Incluir variedad en estructuras de oraciones y tipos de tareas.",
+        "El material debe ser genuinamente atractivo y relevante para el perfil del alumno.",
+        "Si la descripción menciona intereses o dificultades específicas, reflejarlos en el contenido."
+      ]
+    }
+  },
+  "Italian": {
+    code: "Italian",
+    nativeName: "Italiano",
+    promptLang: "Italian",
+    tr: {
+      role: "Sei un insegnante di italiano esperto e progettista di materiali didattici con oltre 20 anni di esperienza. Il tuo compito è creare un'attività in classe professionale, pedagogicamente solida e altamente coinvolgente.",
+      section_context: "📌 CONTESTO DELLO STUDENTE E DELLA LEZIONE",
+      section_task: "🎯 COMPITO",
+      section_req: "📋 REQUISITI",
+      section_format: "📐 FORMATO E OUTPUT",
+      section_quality: "⚙️ STANDARD DI QUALITÀ",
+      f_language: "Lingua",
+      f_level: "Livello",
+      f_profile: "Profilo dello studente",
+      f_format: "Formato della lezione",
+      f_student: "Note sullo studente",
+      f_topic: "Argomento della lezione",
+      f_vocab: "Vocabolario chiave",
+      f_grammar: "Focus grammaticale",
+      f_extra: "Contesto aggiuntivo",
+      output_instr: "Istruzioni dei compiti: in russo. Tutti i contenuti degli esercizi, testi e vocabolario: in italiano.",
+      quality: [
+        "Tutti i contenuti devono essere adeguati al livello e centrati sullo studente.",
+        "Ogni esercizio deve essere significativo e testare vera conoscenza linguistica — evitare domande trabocchetto.",
+        "Usare italiano autentico e naturale — evitare frasi da manuale.",
+        "Includere varietà nelle strutture delle frasi e nei tipi di compiti.",
+        "Il materiale deve essere genuinamente coinvolgente e rilevante per il profilo dello studente.",
+        "Se la descrizione menziona interessi o difficoltà specifici, rifletterli nel contenuto."
+      ]
+    }
+  },
+  "Chinese": {
+    code: "Chinese",
+    nativeName: "中文",
+    promptLang: "Chinese (Mandarin)",
+    tr: {
+      role: "你是一位拥有20多年经验的中文语言教学专家和教育材料设计师。你的任务是创建一个专业的、教学上合理的、高度吸引人的课堂活动。",
+      section_context: "📌 学习者与课程背景",
+      section_task: "🎯 任务",
+      section_req: "📋 要求",
+      section_format: "📐 格式与输出",
+      section_quality: "⚙️ 质量标准",
+      f_language: "语言",
+      f_level: "级别",
+      f_profile: "学习者档案",
+      f_format: "课堂形式",
+      f_student: "学生备注",
+      f_topic: "课程主题",
+      f_vocab: "核心词汇",
+      f_grammar: "语法重点",
+      f_extra: "补充背景",
+      output_instr: "任务说明：用俄语。所有练习内容、文本和词汇：用中文（普通话）。",
+      quality: [
+        "确保所有内容适合学习者水平，以学习者为中心。",
+        "每个练习项目必须有意义，能测试真实的语言知识——避免陷阱题。",
+        "使用地道、自然的中文——避免教科书式的句子。",
+        "在句子结构和任务类型上包含多样性。",
+        "材料应真正吸引人，与学生档案相关。",
+        "如果学生描述提到了具体兴趣或挑战，请在内容中加以体现。"
+      ]
+    }
+  }
 };
 
-function getOutputLang(d, role) {
-  // role: "instructions" = teacher-facing text lang; "content" = target language
-  const info = LANG_LABELS[d.lang] || { native: d.lang, teacher: "Russian" };
-  if (role === "instructions") return info.teacher;
-  if (role === "content") return info.native;
-  // default: instructions in teacher lang, target content in lesson lang
-  return `${info.teacher} (teacher instructions, task labels, explanations, translations) + ${info.native} (all exercise content, examples, texts, vocabulary)`;
+function getLangMeta(lang) {
+  return LANG_META[lang] || LANG_META["English"];
 }
 
+// =============================================
+// LANGUAGE DIRECTIVE BUILDER
+// =============================================
+function buildLangDirective(lang, lm) {
+  const directives = {
+    "English": `⚠️ CRITICAL LANGUAGE RULE:
+All exercise content, texts, vocabulary lists, example sentences, definitions, answer keys, and student-facing materials MUST be written entirely in English.
+Task instructions and teacher notes should be written in Russian (for the Russian-speaking teacher).
+DO NOT mix languages within any single section. If a Russian translation is requested in the requirements, provide it only as a secondary column/note clearly labelled "Перевод".`,
+
+    "German": `⚠️ WICHTIGE SPRACHREGEL:
+Alle Übungsinhalte, Texte, Vokabellisten, Beispielsätze, Definitionen, Lösungsschlüssel und schülergerichtete Materialien MÜSSEN vollständig auf Deutsch verfasst sein.
+Aufgabenanweisungen und Lehrernotizen sollen auf Russisch geschrieben werden (für die russischsprachige Lehrkraft).
+Mische keine Sprachen innerhalb eines Abschnitts. Wenn eine russische Übersetzung angefordert wird, nur als sekundäre Spalte/Notiz mit der Bezeichnung "Перевод" angeben.`,
+
+    "French": `⚠️ RÈGLE LINGUISTIQUE CRITIQUE :
+Tout le contenu des exercices, textes, listes de vocabulaire, phrases exemples, définitions, corrigés et matériaux destinés aux élèves DOIT être entièrement rédigé en français.
+Les instructions des tâches et les notes pour l'enseignant doivent être rédigées en russe (pour l'enseignant russophone).
+Ne mélangez pas les langues dans une même section. Si une traduction en russe est demandée, fournissez-la uniquement en colonne secondaire/note clairement étiquetée "Перевод".`,
+
+    "Spanish": `⚠️ REGLA LINGÜÍSTICA CRÍTICA:
+Todo el contenido de los ejercicios, textos, listas de vocabulario, oraciones de ejemplo, definiciones, claves de respuestas y materiales para estudiantes DEBE estar escrito completamente en español.
+Las instrucciones de las tareas y las notas del profesor deben escribirse en ruso (para el profesor rusohablante).
+No mezcles idiomas dentro de ninguna sección. Si se solicita una traducción al ruso, proporciónala únicamente como columna/nota secundaria claramente etiquetada "Перевод".`,
+
+    "Italian": `⚠️ REGOLA LINGUISTICA CRITICA:
+Tutti i contenuti degli esercizi, i testi, le liste di vocabolario, le frasi esempio, le definizioni, le chiavi delle risposte e i materiali per gli studenti DEVONO essere scritti interamente in italiano.
+Le istruzioni dei compiti e le note per l'insegnante devono essere scritte in russo (per l'insegnante di lingua russa).
+Non mescolare le lingue all'interno di nessuna sezione. Se viene richiesta una traduzione in russo, fornirla solo come colonna/nota secondaria chiaramente etichettata "Перевод".`,
+
+    "Chinese": `⚠️ 关键语言规则：
+所有练习内容、文本、词汇表、例句、定义、答案键和面向学生的材料，必须全部用中文（普通话）书写。
+任务说明和教师注释应用俄语书写（供俄语教师使用）。
+不要在同一个部分混用语言。如果要求提供俄语翻译，仅作为次要列/注释提供，并清楚标注"Перевод"。`,
+  };
+  return directives[lang] || directives["English"];
+}
+
+// =============================================
+// PROMPT BUILDER
+// =============================================
 function buildPrompt(d, config) {
-  const info = LANG_LABELS[d.lang] || { native: d.lang, teacher: "Russian" };
-  const tl = info.teacher; // teacher language (for instructions)
-  const nl = info.native;  // native/target language (for content)
-  const outputLangLine = `Write ALL teacher-facing instructions, task headings, labels, explanations, answer keys, and translations in ${tl}. Write ALL exercise content, example sentences, vocabulary, texts, dialogues, and target-language material in ${nl}.`;
+  const lm = getLangMeta(d.lang);
+  const t = lm.tr;
 
   const studentInfo = [
-    `Target language: ${d.lang}`,
-    `Learner level: ${d.level}`,
-    `Learner profile: ${d.age}`,
-    `Lesson format: ${d.format}`,
-    d.studentDesc ? `Student notes: ${d.studentDesc}` : null,
-    `Lesson topic: ${d.topic}`,
-    d.vocab.length ? `Key vocabulary to include: ${d.vocab.join(', ')}` : null,
-    d.grammar.length ? `Grammar focus: ${d.grammar.join(', ')}` : null,
-    d.extraContext ? `Additional context / teacher wishes: ${d.extraContext}` : null,
+    `${t.f_language}: ${lm.nativeName} (${d.lang})`,
+    `${t.f_level}: ${d.level}`,
+    `${t.f_profile}: ${d.age}`,
+    `${t.f_format}: ${d.format}`,
+    d.studentDesc ? `${t.f_student}: ${d.studentDesc}` : null,
+    `${t.f_topic}: ${d.topic}`,
+    d.vocab.length ? `${t.f_vocab}: ${d.vocab.join(', ')}` : null,
+    d.grammar.length ? `${t.f_grammar}: ${d.grammar.join(', ')}` : null,
+    d.extraContext ? `${t.f_extra}: ${d.extraContext}` : null,
   ].filter(Boolean).join('\n');
 
-  // Replace any hardcoded "Russian" in requirements with the actual teacher language
-  const reqText = config.requirements
-    .map((r, i) => `${i + 1}. ${r.replace(/\bRussian\b/g, tl)}`)
-    .join('\n');
+  const reqText = config.requirements.map((r, i) => `${i + 1}. ${r}`).join('\n');
+  const qualityText = t.quality.map(q => `• ${q}`).join('\n');
 
-  return `You are an expert ${nl} language teacher and materials designer with 20+ years of experience. Your task is to create a professional, pedagogically sound, and highly engaging classroom activity.
+  // Build a strong language directive so AI always responds in the right language
+  const langDirective = buildLangDirective(d.lang, lm);
+
+  return `${t.role}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📌 LEARNER & LESSON CONTEXT
+${t.section_context}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${studentInfo}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 TASK
+${t.section_task}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${config.task}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 REQUIREMENTS
+${t.section_req}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${reqText}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📐 FORMAT & OUTPUT LANGUAGE
+${t.section_format}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${config.format}
-${outputLangLine}
+${t.output_instr}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚙️ QUALITY STANDARDS
+${t.section_quality}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-• Ensure all content is level-appropriate and learner-centred.
-• Every exercise item must be meaningful and test real language knowledge — avoid trick questions.
-• Use authentic, natural ${d.lang} (avoid textbook-sounding sentences).
-• Include variety in sentence structures and task types.
-• Make the material genuinely engaging and relevant to the student's interests and profile.
-• If the student description mentions specific interests or challenges, reflect these in the content.`;
+${qualityText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌐 ЯЗЫК ВЫВОДА / OUTPUT LANGUAGE DIRECTIVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${langDirective}`;
 }
 
 // =============================================
@@ -1809,7 +2021,6 @@ function generateFinalPrompt() {
   const section = SECTIONS.find(s => s.id === state.selectedSection);
   const prompt = section.prompts.find(p => p.id === state.selectedPrompt);
 
-  const info = LANG_LABELS[state.lang] || { native: state.lang, teacher: "Russian" };
   const d = {
     lang: state.lang,
     level: state.level,
@@ -1819,9 +2030,7 @@ function generateFinalPrompt() {
     grammar: state.grammar,
     topic: state.topic,
     studentDesc: state.studentDesc,
-    extraContext: state.extraContext,
-    tl: info.teacher,   // teacher language
-    nl: info.native,    // target/native language
+    extraContext: state.extraContext
   };
 
   const result = prompt.generate(d);
@@ -1944,3 +2153,4 @@ renderSteps(1);
 </script>
 </body>
 </html>
+
